@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+		<link rel="stylesheet" href="./index.css" />
+		<title>Zapping</title>
+	</head>
+	<body class="bg-[#252a2b] h-screen">
+		<div class="bg-black flex items-center flex-col h-full">
+			<video id="video" class="h-1/3" poster="./poster.png" controls></video>
+			<iframe
+				src="https://www.youtube.com/embed/avly0uwZzOE"
+				title="Titulo"
+				frameborder="0"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+				referrerpolicy="strict-origin-when-cross-origin"
+				allowfullscreen
+				class="hidden h-1/3"
+				id="playerYoutube"
+			></iframe>
+			<nav class="w-full flex flex-col h-2/3">
+				<div
+					class="flex justify-around p-4 bg-[#252a2b] text-sm border-b-1 border-b-[#121414] border-t border-t-[#222626]"
+				>
+					<button
+						class="bg-[#444646] text-[#acaead] text-sm border-2 border-[#565958] rounded-lg p-1"
+						id="btnAllChannels"
+					>
+						Todos los canales
+					</button>
+					<button
+						class="bg-[#444646] text-[#acaead] text-sm border-2 border-[#565958] rounded-lg p-1"
+						id="btnFavorites"
+					>
+						Favoritos
+					</button>
+					<button
+						class="bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg p-1"
+						id="btnLoadList"
+					>
+						Abrir lista
+					</button>
+				</div>
+				<div
+					id="nav"
+					class="flex flex-wrap content-start overflow-auto bg-[#3c4248] h-full"
+				></div>
+			</nav>
+		</div>
+		<dialog id="addListDialog" class="bg-[#252a2b] w-full h-full">
+			<div class="flex flex-col w-full h-full items-center justify-center">
+				<p class="text-white">Pega el enlace del archivo .m3u aquí.</p>
+				<input type="text" id="inputAddURLM3U" class="bg-white m-2" />
+				<div class="flex">
+					<button
+						id="btnConfirmLoad"
+						class="m-2 p-1 bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg"
+					>
+						Listo
+					</button>
+					<button
+						id="btnCancelLoad"
+						class="m-2 p-1 bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg"
+					>
+						Cancelar
+					</button>
+				</div>
+			</div>
+		</dialog>
+
+		<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+		<script src="index.js"></script>
+	</body>
+</html>
