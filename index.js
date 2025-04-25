@@ -3,7 +3,7 @@ async function getFileM3U(url) {
 	return await dataM3U.text();
 }
 
-function processM3UData(textM3U) {
+function getChannels(textM3U) {
 	let arrayLinesOfText = textM3U.split('\n');
 	let channels = [];
 	let actualChannelData = null;
@@ -35,6 +35,10 @@ function processM3UData(textM3U) {
 
 	return channels;
 }
+
+const getFavoritesChannels = () => {
+	return JSON.parse(localStorage.getItem('favoriteChannels'));
+};
 
 const buildChannelSection = (channel) => {
 	const channelSection = document.createElement('div');
@@ -97,7 +101,7 @@ const buildChannelSection = (channel) => {
 
 	channelSection.appendChild(channelButtonPlay);
 
-	nav.appendChild(channelSection);
+	return channelSection;
 };
 
 const setupButtonLoadChannel = (channelSection, channelSections) => {
@@ -187,7 +191,21 @@ const setupButtonFav = (button) => {
 const showFavorites = () => {
 	if (localStorage.getItem('favoriteChannels')) {
 		const channels = JSON.parse(localStorage.getItem('favoriteChannels'));
-		buildChannelMenu(channels);
+		buildChannelsList(channels);
+	}
+};
+
+const showChannelsSection = (isSectionFavoritesVisible) => {
+	const sectionFavorites = document.getElementById('favorites');
+	const sectionAllChannels = document.getElementById('allChannels');
+	if (isSectionFavoritesVisible) {
+		sectionAllChannels.classList.add('hidden');
+		sectionFavorites.classList.remove('hidden');
+		btnToggleList.innerText = 'Todos los canales';
+	} else {
+		sectionAllChannels.classList.remove('hidden');
+		sectionFavorites.classList.add('hidden');
+		btnToggleList.innerText = 'Favoritos';
 	}
 };
 
@@ -215,10 +233,11 @@ btnConfirmLoad.addEventListener('click', async () => {
 	}
 });
 
-const buildChannelMenu = (channels, nav) => {
-	nav.innerHTML = '';
+const buildChannelsList = (channels, section) => {
+	section.innerHTML = '';
 	channels.forEach((channel) => {
-		buildChannelSection(channel);
+		const channelSection = buildChannelSection(channel);
+		section.appendChild(channelSection);
 	});
 
 	const channelSections = [...document.querySelectorAll('.channel')];
@@ -244,30 +263,28 @@ if (Hls.isSupported()) {
 	//var videoSrc = channels[0].url;
 	//hls.loadSource(videoSrc);
 	//hls.attachMedia(video);
+	const sectionFavorites = document.getElementById('favorites');
+	const sectionAllChannels = document.getElementById('allChannels');
+	let isSectionFavoritesVisible = false;
 
-	const urlM3U = localStorage.getItem('urlM3U');
-	if (urlM3U) {
-		const nav = document.getElementById('nav');
+	if (localStorage.getItem('urlM3U')) {
+		const urlM3U = localStorage.getItem('urlM3U');
 		getFileM3U(urlM3U).then((response) => {
-			const channels = processM3UData(response);
-			buildChannelMenu(channels, nav);
-
-			const btnAllChannels = document.getElementById('btnAllChannels');
-			btnAllChannels.addEventListener('click', () =>
-				buildChannelMenu(channels, nav)
-			);
-
-			const btnFavorites = document.getElementById('btnFavorites');
-			btnFavorites.addEventListener('click', () => {
-				if (localStorage.getItem('favoriteChannels')) {
-					buildChannelMenu(
-						JSON.parse(localStorage.getItem('favoriteChannels')),
-						nav
-					);
-				}
-			});
+			const channels = getChannels(response);
+			buildChannelsList(channels, sectionAllChannels);
 		});
 	}
+
+	if (localStorage.getItem('favoriteChannels')) {
+		const channels = getFavoritesChannels();
+		buildChannelsList(channels, sectionFavorites);
+	}
+
+	const btnToggleList = document.getElementById('btnToggleList');
+	btnToggleList.addEventListener('click', () => {
+		isSectionFavoritesVisible = !isSectionFavoritesVisible;
+		showChannelsSection(isSectionFavoritesVisible);
+	});
 } else {
 	console.log('El navegador no soporta Hls');
 }

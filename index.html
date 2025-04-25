@@ -27,13 +27,7 @@
 				>
 					<button
 						class="bg-[#444646] text-[#acaead] text-sm border-2 border-[#565958] rounded-lg p-1"
-						id="btnAllChannels"
-					>
-						Todos los canales
-					</button>
-					<button
-						class="bg-[#444646] text-[#acaead] text-sm border-2 border-[#565958] rounded-lg p-1"
-						id="btnFavorites"
+						id="btnToggleList"
 					>
 						Favoritos
 					</button>
@@ -44,10 +38,16 @@
 						Abrir lista
 					</button>
 				</div>
-				<div
-					id="nav"
+				<section
+					id="allChannels"
 					class="flex flex-wrap content-start overflow-auto bg-[#3c4248] h-full"
-				></div>
+				></section>
+				<section
+					id="favorites"
+					class="flex flex-wrap content-start overflow-auto bg-[#3c4248] h-full hidden"
+				>
+					Listaaaa de favoritosss
+				</section>
 			</nav>
 		</div>
 		<dialog id="addListDialog" class="bg-[#252a2b] w-full h-full">
