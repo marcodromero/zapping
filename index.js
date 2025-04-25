@@ -188,13 +188,6 @@ const setupButtonFav = (button) => {
 	});
 };
 
-const showFavorites = () => {
-	if (localStorage.getItem('favoriteChannels')) {
-		const channels = JSON.parse(localStorage.getItem('favoriteChannels'));
-		buildChannelsList(channels);
-	}
-};
-
 const showChannelsSection = (isSectionFavoritesVisible) => {
 	const sectionFavorites = document.getElementById('favorites');
 	const sectionAllChannels = document.getElementById('allChannels');
@@ -260,25 +253,20 @@ const buildChannelsList = (channels, section) => {
 //Main
 if (Hls.isSupported()) {
 	var hls = new Hls();
-	//var videoSrc = channels[0].url;
-	//hls.loadSource(videoSrc);
-	//hls.attachMedia(video);
+	let isSectionFavoritesVisible = false;
 	const sectionFavorites = document.getElementById('favorites');
 	const sectionAllChannels = document.getElementById('allChannels');
-	let isSectionFavoritesVisible = false;
+	const favoriteChannels = getFavoritesChannels();
+	const urlM3U = localStorage.getItem('urlM3U');
 
-	if (localStorage.getItem('urlM3U')) {
-		const urlM3U = localStorage.getItem('urlM3U');
-		getFileM3U(urlM3U).then((response) => {
-			const channels = getChannels(response);
-			buildChannelsList(channels, sectionAllChannels);
+	if (urlM3U) {
+		getFileM3U(urlM3U).then((fileM3U) => {
+			const allChannels = getChannels(fileM3U);
+			buildChannelsList(allChannels, sectionAllChannels);
 		});
 	}
 
-	if (localStorage.getItem('favoriteChannels')) {
-		const channels = getFavoritesChannels();
-		buildChannelsList(channels, sectionFavorites);
-	}
+	favoriteChannels && buildChannelsList(favoriteChannels, sectionFavorites);
 
 	const btnToggleList = document.getElementById('btnToggleList');
 	btnToggleList.addEventListener('click', () => {
