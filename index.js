@@ -104,45 +104,37 @@ const buildChannelSection = (channel) => {
 	return channelSection;
 };
 
-const setupButtonLoadChannel = (channelSection, channelSections) => {
-	const video = document.getElementById('video');
-	const playerYoutube = document.getElementById('playerYoutube');
-	const channelPlay = channelSection.querySelector('.channel__play');
+const loadPlaylistM3U = (url, videoElement) => {
+	hls.loadSource(url);
+	hls.attachMedia(videoElement);
+};
 
-	channelPlay.addEventListener('click', async () => {
-		channelSections.forEach((cs) => {
-			cs.classList.remove('bg-[#1d4f85]');
-			channelSection.classList.add('bg-[#3c4248]');
-		});
-		channelSection.classList.remove('bg-[#3c4248]');
-		channelSection.classList.add('bg-[#1d4f85]');
+const loadVideoYoutube = (url, iframeYoutube) => {
+	hls.loadSource('');
+	hls.attachMedia(video);
+	iframeYoutube.src = url + '?autoplay=1';
+};
 
-		try {
-			await fetch(channelPlay.dataset.url);
-			const regexYoutube =
-				/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\b/;
-			const youtubeURL = channelPlay.dataset.url.match(regexYoutube);
+const showElement = (element) => {
+	element.classList.remove('hidden');
+};
 
-			if (youtubeURL) {
-				hls.loadSource('');
-				hls.attachMedia(video);
-				playerYoutube.src = channelPlay.dataset.url + '?autoplay=1';
-				video.classList.add('hidden');
-				playerYoutube.classList.remove('hidden');
-			} else {
-				playerYoutube.src = '';
-				playerYoutube.classList.add('hidden');
-				video.classList.remove('hidden');
-				hls.loadSource(channelPlay.dataset.url);
-				hls.attachMedia(video);
-			}
-		} catch (error) {
-			if (error) {
-				channelSection.classList.remove('bg-[#3c4248]');
-				channelSection.classList.add('bg-red-950');
-			}
-		}
-	});
+const hideElement = (element) => {
+	element.classList.add('hidden');
+};
+
+const clearSrcElement = (element) => {
+	element.src = '';
+};
+
+const isYoutubeUrl = (url) => {
+	const regexYoutube = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\b/;
+	const result = url.match(regexYoutube);
+	result ? true : false;
+};
+
+const setTextButton = (button, text) => {
+	button.innerText = text;
 };
 
 const setupButtonFav = (button) => {
@@ -188,20 +180,6 @@ const setupButtonFav = (button) => {
 	});
 };
 
-const showChannelsSection = (isSectionFavoritesVisible) => {
-	const sectionFavorites = document.getElementById('favorites');
-	const sectionAllChannels = document.getElementById('allChannels');
-	if (isSectionFavoritesVisible) {
-		sectionAllChannels.classList.add('hidden');
-		sectionFavorites.classList.remove('hidden');
-		btnToggleList.innerText = 'Todos los canales';
-	} else {
-		sectionAllChannels.classList.remove('hidden');
-		sectionFavorites.classList.add('hidden');
-		btnToggleList.innerText = 'Favoritos';
-	}
-};
-
 const btnLoadList = document.getElementById('btnLoadList');
 const btnCancel = document.getElementById('btnCancelLoad');
 const addListDialog = document.getElementById('addListDialog');
@@ -226,16 +204,21 @@ btnConfirmLoad.addEventListener('click', async () => {
 	}
 });
 
+const unpaintChannelSection = (channelSection) => {
+	channelSection.classList.remove('bg-[#1d4f85]');
+	channelSection.classList.add('bg-[#3c4248]');
+};
+
+const paintChannelSection = (channelSection) => {
+	channelSection.classList.remove('bg-[#3c4248]');
+	channelSection.classList.add('bg-[#1d4f85]');
+};
+
 const buildChannelsList = (channels, section) => {
 	section.innerHTML = '';
 	channels.forEach((channel) => {
 		const channelSection = buildChannelSection(channel);
 		section.appendChild(channelSection);
-	});
-
-	const channelSections = [...document.querySelectorAll('.channel')];
-	channelSections.forEach((channelSection) => {
-		setupButtonLoadChannel(channelSection, channelSections);
 	});
 
 	const likeButtons = [...document.querySelectorAll('.channel__btnLike')];
@@ -253,25 +236,65 @@ const buildChannelsList = (channels, section) => {
 //Main
 if (Hls.isSupported()) {
 	var hls = new Hls();
-	let isSectionFavoritesVisible = false;
 	const sectionFavorites = document.getElementById('favorites');
 	const sectionAllChannels = document.getElementById('allChannels');
 	const favoriteChannels = getFavoritesChannels();
 	const urlM3U = localStorage.getItem('urlM3U');
+	const btnToggleList = document.getElementById('btnToggleList');
+	const videoElement = document.getElementById('video');
+	const iframeYoutube = document.getElementById('playerYoutube');
+	let isSectionFavoritesVisible = false;
+	let channelSection = null;
 
 	if (urlM3U) {
 		getFileM3U(urlM3U).then((fileM3U) => {
 			const allChannels = getChannels(fileM3U);
 			buildChannelsList(allChannels, sectionAllChannels);
+
+			if (favoriteChannels) {
+				buildChannelsList(favoriteChannels, sectionFavorites);
+			}
+
+			const buttonsLoadChannel = [
+				...document.querySelectorAll('.channel__play'),
+			];
+			buttonsLoadChannel.forEach((buttonLoadChannel) => {
+				buttonLoadChannel.addEventListener('click', async () => {
+					const previousChannelSection = channelSection;
+					if (previousChannelSection) {
+						unpaintChannelSection(previousChannelSection);
+					}
+					const channelSectionActive = buttonLoadChannel.parentElement;
+
+					paintChannelSection(channelSectionActive);
+					channelSection = channelSectionActive;
+					const channelUrl = buttonLoadChannel.dataset.url;
+					if (isYoutubeUrl(channelUrl)) {
+						hideElement(videoElement);
+						showElement(iframeYoutube);
+						loadVideoYoutube(channelUrl, iframeYoutube);
+					} else {
+						hideElement(iframeYoutube);
+						clearSrcElement(iframeYoutube);
+						showElement(videoElement);
+						loadPlaylistM3U(channelUrl, videoElement);
+					}
+				});
+			});
 		});
 	}
 
-	favoriteChannels && buildChannelsList(favoriteChannels, sectionFavorites);
-
-	const btnToggleList = document.getElementById('btnToggleList');
 	btnToggleList.addEventListener('click', () => {
 		isSectionFavoritesVisible = !isSectionFavoritesVisible;
-		showChannelsSection(isSectionFavoritesVisible);
+		if (isSectionFavoritesVisible) {
+			hideElement(sectionAllChannels);
+			showElement(sectionFavorites);
+			setTextButton(btnToggleList, 'Todos los canales');
+		} else {
+			hideElement(sectionFavorites);
+			showElement(sectionAllChannels);
+			setTextButton(btnToggleList, 'Favoritos');
+		}
 	});
 } else {
 	console.log('El navegador no soporta Hls');
