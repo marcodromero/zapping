@@ -46,11 +46,11 @@ const buildChannelSection = (channel) => {
 	channelSection.classList.add('w-full');
 	channelSection.classList.add('min-h-1/7');
 	channelSection.classList.add('border-t-1');
-	channelSection.classList.add('border-t-[#6a7580]');
+	channelSection.classList.add('border-t-[#29374d]');
 	channelSection.classList.add('border-b-2');
-	channelSection.classList.add('border-b-[#2a2f33]');
-	channelSection.classList.add('bg-[#3c4248]');
-	channelSection.classList.add('hover:bg-[#1d4f85]');
+	channelSection.classList.add('border-b-[#0e121a]');
+	channelSection.classList.add('bg-[#1c2534]');
+	channelSection.classList.add('hover:bg-[#3a6280]');
 	channelSection.classList.add('channel');
 
 	const channelBtnLike = document.createElement('button');
@@ -157,7 +157,7 @@ const setupButtonFav = (button) => {
 					'favoriteChannels',
 					JSON.stringify(favoriteChannels)
 				);
-				button.classList.red('text-[#ff0000]');
+				button.classList.red('text-[#991888]');
 				button.classList.add('text-[#c0c6c9]');
 			} else {
 				favoriteChannels.push(channelData);
@@ -166,7 +166,7 @@ const setupButtonFav = (button) => {
 					JSON.stringify(favoriteChannels)
 				);
 				button.classList.remove('text-[#c0c6c9]');
-				button.classList.add('text-[#ff0000]');
+				button.classList.add('text-[#991888]');
 			}
 		} else {
 			favoriteChannels.push(channelData);
@@ -205,13 +205,13 @@ btnConfirmLoad.addEventListener('click', async () => {
 });
 
 const unpaintChannelSection = (channelSection) => {
-	channelSection.classList.remove('bg-[#1d4f85]');
-	channelSection.classList.add('bg-[#3c4248]');
+	channelSection.classList.remove('bg-[#3a6280]');
+	channelSection.classList.add('bg-[#1c2534]');
 };
 
 const paintChannelSection = (channelSection) => {
-	channelSection.classList.remove('bg-[#3c4248]');
-	channelSection.classList.add('bg-[#1d4f85]');
+	channelSection.classList.remove('bg-[#1c2534]');
+	channelSection.classList.add('bg-[#3a6280]');
 };
 
 const buildChannelsList = (channels, section) => {
