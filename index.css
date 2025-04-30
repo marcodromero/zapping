@@ -3,6 +3,11 @@ dialog:modal {
 	max-height: 100vw;
 }
 
+#allChannels,
+#favorites {
+	overscroll-behavior: contain;
+}
+
 ::-webkit-scrollbar {
 	width: 20px;
 }

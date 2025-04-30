@@ -73,23 +73,11 @@ const buildChannelSection = (channel) => {
 	channelButtonPlay.classList.add('items-center');
 	channelButtonPlay.dataset.url = channel.url;
 
-	const imageObserver = new IntersectionObserver((entries, observer) => {
-		entries.forEach((entry) => {
-			if (entry.isIntersecting) {
-				const img = entry.target;
-				img.src = img.dataset.src;
-				img.classList.remove('lazy');
-				observer.unobserve(img);
-			}
-		});
-	});
-
 	const channelLogo = document.createElement('img');
 	channelLogo.classList.add('lazy');
 	channelLogo.classList.add('w-10');
 	channelLogo.classList.add('h-full');
-	channelLogo.dataset.src = channel.tvgLogo;
-	imageObserver.observe(channelLogo);
+	channelLogo.src = channel.tvgLogo;
 	channelButtonPlay.appendChild(channelLogo);
 
 	const channelName = document.createElement('p');
@@ -143,21 +131,21 @@ const setupButtonFav = (button) => {
 		const channelData = JSON.parse(button.dataset.info);
 		if (localStorage.getItem('favoriteChannels')) {
 			favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
-			let existe = 0;
+			let exist = 0;
 			let channelIndex;
 			favoriteChannels.forEach((favoriteChannel, index) => {
 				if (favoriteChannel.tvgId === channelData.tvgId) {
-					existe = 1;
+					exist = 1;
 					channelIndex = index;
 				}
 			});
-			if (existe) {
+			if (exist) {
 				favoriteChannels.splice(channelIndex, 1);
 				localStorage.setItem(
 					'favoriteChannels',
 					JSON.stringify(favoriteChannels)
 				);
-				button.classList.red('text-[#991888]');
+				button.classList.red('text-[#ff0000]');
 				button.classList.add('text-[#c0c6c9]');
 			} else {
 				favoriteChannels.push(channelData);
@@ -166,7 +154,7 @@ const setupButtonFav = (button) => {
 					JSON.stringify(favoriteChannels)
 				);
 				button.classList.remove('text-[#c0c6c9]');
-				button.classList.add('text-[#991888]');
+				button.classList.add('text-[#ff0000]');
 			}
 		} else {
 			favoriteChannels.push(channelData);
@@ -180,30 +168,6 @@ const setupButtonFav = (button) => {
 	});
 };
 
-const btnLoadList = document.getElementById('btnLoadList');
-const btnCancel = document.getElementById('btnCancelLoad');
-const addListDialog = document.getElementById('addListDialog');
-const btnConfirmLoad = document.getElementById('btnConfirmLoad');
-btnLoadList.addEventListener('click', () => {
-	addListDialog.showModal();
-});
-btnCancel.addEventListener('click', () => {
-	addListDialog.close();
-});
-btnConfirmLoad.addEventListener('click', async () => {
-	const urlM3U = document.getElementById('inputAddURLM3U').value;
-	try {
-		const response = await fetch(urlM3U);
-		if (response.status === 200) {
-			localStorage.setItem('urlM3U', urlM3U);
-			addListDialog.close();
-			renderChannels(localStorage.getItem('urlM3U'));
-		}
-	} catch (error) {
-		console.log('La url no responde.', error);
-	}
-});
-
 const unpaintChannelSection = (channelSection) => {
 	channelSection.classList.remove('bg-[#3a6280]');
 	channelSection.classList.add('bg-[#1c2534]');
@@ -214,22 +178,19 @@ const paintChannelSection = (channelSection) => {
 	channelSection.classList.add('bg-[#3a6280]');
 };
 
+const showModal = (dialog) => {
+	dialog.showModal();
+};
+
+const closeModal = (dialog) => {
+	dialog.close();
+};
+
 const buildChannelsList = (channels, section) => {
 	section.innerHTML = '';
 	channels.forEach((channel) => {
 		const channelSection = buildChannelSection(channel);
 		section.appendChild(channelSection);
-	});
-
-	const likeButtons = [...document.querySelectorAll('.channel__btnLike')];
-	likeButtons.forEach((likeButton) => {
-		setupButtonFav(likeButton);
-	});
-
-	video.addEventListener('loadeddata', () => {
-		if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-			video.play();
-		}
 	});
 };
 
@@ -243,29 +204,62 @@ if (Hls.isSupported()) {
 	const btnToggleList = document.getElementById('btnToggleList');
 	const videoElement = document.getElementById('video');
 	const iframeYoutube = document.getElementById('playerYoutube');
+	const btnLoadList = document.getElementById('btnLoadList');
+	const btnCancel = document.getElementById('btnCancelLoad');
+	const addListDialog = document.getElementById('addListDialog');
+	const btnConfirmLoad = document.getElementById('btnConfirmLoad');
 	let isSectionFavoritesVisible = false;
 	let channelSection = null;
+	let counterElements = 0;
+	const initialElements = 15;
+	const elementsToAdd = 15;
+	let isLoading = false;
+
+	btnLoadList.addEventListener('click', showModal(addListDialog));
+	btnCancel.addEventListener('click', closeModal(addListDialog));
+
+	btnConfirmLoad.addEventListener('click', async () => {
+		const urlM3U = document.getElementById('inputAddURLM3U').value;
+		try {
+			const response = await fetch(urlM3U);
+			if (response.status === 200) {
+				localStorage.setItem('urlM3U', urlM3U);
+				addListDialog.close();
+				renderChannels(localStorage.getItem('urlM3U'));
+			}
+		} catch (error) {
+			console.log('La url no responde.', error);
+		}
+	});
+
+	const addChannelsSections = (initialIndex, amount, channels) => {
+		for (let i = initialIndex; i < initialIndex + amount; i++) {
+			const newChannelSection = buildChannelSection(channels[i]);
+			sectionAllChannels.appendChild(newChannelSection);
+		}
+		return (initialIndex += amount);
+	};
 
 	if (urlM3U) {
 		getFileM3U(urlM3U).then((fileM3U) => {
-			const allChannels = getChannels(fileM3U);
-			buildChannelsList(allChannels, sectionAllChannels);
+			const channels = getChannels(fileM3U);
+			counterElements = addChannelsSections(
+				counterElements,
+				initialElements,
+				channels
+			);
 
 			if (favoriteChannels) {
 				buildChannelsList(favoriteChannels, sectionFavorites);
 			}
 
-			const buttonsLoadChannel = [
-				...document.querySelectorAll('.channel__play'),
-			];
-			buttonsLoadChannel.forEach((buttonLoadChannel) => {
-				buttonLoadChannel.addEventListener('click', async () => {
+			sectionAllChannels.addEventListener('click', (event) => {
+				const buttonLoadChannel = event.target.closest('.channel__play');
+				if (buttonLoadChannel) {
 					const previousChannelSection = channelSection;
-					if (previousChannelSection) {
+					previousChannelSection &&
 						unpaintChannelSection(previousChannelSection);
-					}
 					const channelSectionActive = buttonLoadChannel.parentElement;
-
 					paintChannelSection(channelSectionActive);
 					channelSection = channelSectionActive;
 					const channelUrl = buttonLoadChannel.dataset.url;
@@ -279,7 +273,51 @@ if (Hls.isSupported()) {
 						showElement(videoElement);
 						loadPlaylistM3U(channelUrl, videoElement);
 					}
-				});
+				}
+			});
+
+			sectionFavorites.addEventListener('click', (event) => {
+				const buttonLoadChannel = event.target.closest('.channel__play');
+				if (buttonLoadChannel) {
+					const previousChannelSection = channelSection;
+					previousChannelSection &&
+						unpaintChannelSection(previousChannelSection);
+					const channelSectionActive = buttonLoadChannel.parentElement;
+					paintChannelSection(channelSectionActive);
+					channelSection = channelSectionActive;
+					const channelUrl = buttonLoadChannel.dataset.url;
+					if (isYoutubeUrl(channelUrl)) {
+						hideElement(videoElement);
+						showElement(iframeYoutube);
+						loadVideoYoutube(channelUrl, iframeYoutube);
+					} else {
+						hideElement(iframeYoutube);
+						clearSrcElement(iframeYoutube);
+						showElement(videoElement);
+						loadPlaylistM3U(channelUrl, videoElement);
+					}
+				}
+			});
+
+			sectionAllChannels.addEventListener('scroll', () => {
+				const scrollTop = sectionAllChannels.scrollTop;
+				const scrollHeight = sectionAllChannels.scrollHeight;
+				const clientHeight = sectionAllChannels.clientHeight;
+
+				if (scrollTop + clientHeight >= scrollHeight - 20 && !isLoading) {
+					isLoading = true;
+					counterElements = addChannelsSections(
+						counterElements,
+						elementsToAdd,
+						channels
+					);
+					isLoading = false;
+				}
+			});
+
+			const likeButtons = [...document.querySelectorAll('.channel__btnLike')];
+			likeButtons.forEach((likeButton) => {
+				setupButtonFav(likeButton);
 			});
 		});
 	}
@@ -294,6 +332,12 @@ if (Hls.isSupported()) {
 			hideElement(sectionFavorites);
 			showElement(sectionAllChannels);
 			setTextButton(btnToggleList, 'Favoritos');
+		}
+	});
+
+	video.addEventListener('loadeddata', () => {
+		if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+			video.play();
 		}
 	});
 } else {
