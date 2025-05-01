@@ -279,7 +279,7 @@ if (Hls.isSupported()) {
 	};
 
 	loadListButton.addEventListener('click', () => {
-		hideMessaggesModal();
+		hideMessaggesModal(msgError, msgSuccess);
 		showModal(loadListDialog);
 	});
 	cancelLoadButton.addEventListener('click', () => closeModal(loadListDialog));
