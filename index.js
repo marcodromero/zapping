@@ -53,9 +53,11 @@ const buildChannelContainer = () => {
 
 const buildFavoriteButton = (channel, favoriteChannels) => {
 	const favoriteButton = document.createElement('button');
-	const isCurrentlyFavorite = favoriteChannels.some(
-		(favoriteChannel) => favoriteChannel.tvgId === channel.tvgId
-	);
+	const isCurrentlyFavorite = favoriteChannels
+		? favoriteChannels.some(
+				(favoriteChannel) => favoriteChannel.tvgId === channel.tvgId
+			)
+		: null;
 	if (isCurrentlyFavorite) {
 		favoriteButton.innerText = '♥';
 	} else {
@@ -375,7 +377,6 @@ if (Hls.isSupported()) {
 			lastIndex = arraylength;
 		}
 		for (let i = initialIndex; i < lastIndex; i++) {
-			console.log('construyendo', channels[i]);
 			const newChannelSection = buildChannelSection(
 				channels[i],
 				favoriteChannels
