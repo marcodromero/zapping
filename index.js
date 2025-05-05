@@ -258,13 +258,15 @@ const setupConfirmLoadButton = (
 	confirmLoadButton,
 	inputURLM3U,
 	msgSuccess,
-	msgError
+	msgError,
+	renderAllChannels
 ) => {
 	confirmLoadButton.addEventListener('click', async () => {
 		try {
 			const response = await fetch(inputURLM3U.value);
 			if (response.status === 200) {
 				localStorage.setItem('urlM3U', inputURLM3U.value);
+				renderAllChannels();
 				msgSuccess.classList.remove('hidden');
 			}
 		} catch (error) {
@@ -345,6 +347,13 @@ if (Hls.isSupported()) {
 	const inputURLM3U = document.getElementById('inputAddURLM3U');
 	let isSectionFavoritesVisible = false;
 	let currentlyPlayingChannelSection = null;
+	const defaultControl = {
+		loadedChannelsCount: 0,
+		initialLoadCount: 15,
+		loadMoreCount: 15,
+		isLoading: false,
+		isCompleteList: false,
+	};
 	let allChannelsControl = {
 		loadedChannelsCount: 0,
 		initialLoadCount: 15,
@@ -362,7 +371,14 @@ if (Hls.isSupported()) {
 
 	setupOpenModal(loadListButton, msgError, msgSuccess);
 	setupCloseModal(cancelLoadButton, loadListDialog);
-	setupConfirmLoadButton(confirmLoadButton, inputURLM3U, msgSuccess, msgError);
+	setupConfirmLoadButton(
+		confirmLoadButton,
+		inputURLM3U,
+		msgSuccess,
+		msgError,
+		renderAllChannels,
+		sectionAllChannels
+	);
 
 	const addChannelsSections = (
 		initialIndex,
@@ -386,26 +402,32 @@ if (Hls.isSupported()) {
 		return (initialIndex += amount);
 	};
 
-	if (urlM3U) {
-		fetchM3UFile(urlM3U).then((fileM3U) => {
-			const channels = getChannels(fileM3U);
-			allChannelsControl.loadedChannelsCount = addChannelsSections(
-				allChannelsControl.loadedChannelsCount,
-				allChannelsControl.initialLoadCount,
-				channels,
-				buildChannelSection,
-				sectionAllChannels
-			);
+	function renderAllChannels() {
+		if (urlM3U) {
+			allChannelsControl = defaultControl;
+			sectionAllChannels.innerHTML = '';
+			fetchM3UFile(urlM3U).then((fileM3U) => {
+				const channels = getChannels(fileM3U);
+				allChannelsControl.loadedChannelsCount = addChannelsSections(
+					allChannelsControl.loadedChannelsCount,
+					allChannelsControl.initialLoadCount,
+					channels,
+					buildChannelSection,
+					sectionAllChannels
+				);
 
-			setupInfiniteScroll(
-				sectionAllChannels,
-				allChannelsControl,
-				addChannelsSections,
-				buildChannelSection,
-				channels
-			);
-		});
+				setupInfiniteScroll(
+					sectionAllChannels,
+					allChannelsControl,
+					addChannelsSections,
+					buildChannelSection,
+					channels
+				);
+			});
+		}
 	}
+
+	renderAllChannels();
 
 	if (favoriteChannels) {
 		favoritesControl.loadedChannelsCount = addChannelsSections(
