@@ -444,6 +444,15 @@ if (Hls.isSupported()) {
 		paintChannelSection
 	);
 
+	setupChannelClickListener(
+		sectionFavorites,
+		video,
+		youtubePlayer,
+		currentlyPlayingChannelSection,
+		unpaintChannelSection,
+		paintChannelSection
+	);
+
 	setupAutoplay(video);
 } else {
 	console.log('El navegador no soporta Hls');
