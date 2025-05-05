@@ -1,6 +1,5 @@
 const cacheName = 'mi-pwa-cache-v1';
 const staticAssets = [
-	'/',
 	'./index.html',
 	'./index.css',
 	'./index.js',
