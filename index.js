@@ -363,7 +363,7 @@ if (Hls.isSupported()) {
 	const sectionFavorites = document.getElementById('favorites');
 	const sectionAllChannels = document.getElementById('allChannels');
 	let favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
-	const urlM3U = localStorage.getItem('urlM3U');
+	let urlM3U = localStorage.getItem('urlM3U');
 	const toggleListButton = document.getElementById('toggleListButton');
 	const video = document.getElementById('video');
 	const youtubePlayer = document.getElementById('youtubePlayer');
@@ -432,11 +432,13 @@ if (Hls.isSupported()) {
 	};
 
 	function renderAllChannels() {
+		urlM3U = localStorage.getItem('urlM3U');
+
 		if (urlM3U) {
-			allChannelsControl = { ...defaultControl };
-			sectionAllChannels.innerHTML = '';
 			fetchM3UFile(urlM3U).then((fileM3U) => {
 				const channels = getChannels(fileM3U);
+				allChannelsControl = { ...defaultControl };
+				sectionAllChannels.innerHTML = '';
 				allChannelsControl.loadedChannelsCount = addChannelsSections(
 					allChannelsControl.loadedChannelsCount,
 					allChannelsControl.initialLoadCount,
@@ -459,12 +461,12 @@ if (Hls.isSupported()) {
 	renderAllChannels();
 
 	function renderFavorites() {
-		favoritesControl = { ...defaultControl };
-		sectionFavorites.innerHTML = '';
 		favoriteChannels = favoriteChannels = JSON.parse(
 			localStorage.getItem('favoriteChannels')
 		);
 		if (favoriteChannels) {
+			favoritesControl = { ...defaultControl };
+			sectionFavorites.innerHTML = '';
 			favoritesControl.loadedChannelsCount = addChannelsSections(
 				favoritesControl.loadedChannelsCount,
 				favoritesControl.initialLoadCount,
