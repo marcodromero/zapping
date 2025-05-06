@@ -72,6 +72,7 @@ const buildFavoriteButton = (channel, favoriteChannels) => {
 	favoriteButton.classList.add('h-full');
 	favoriteButton.classList.add('channel__button');
 	favoriteButton.classList.add('channel__favorite');
+	favoriteButton.id = 'fb_' + channel.tvgId;
 	return favoriteButton;
 };
 
@@ -144,7 +145,8 @@ const setupChannelClickListener = (
 	youtubePlayer,
 	currentlyPlayingChannelSection,
 	unpaintChannelSection,
-	paintChannelSection
+	paintChannelSection,
+	renderFavorites
 ) => {
 	channelsContainer.addEventListener('click', (event) => {
 		const clickedButton = event.target.closest('.channel__button');
@@ -154,29 +156,34 @@ const setupChannelClickListener = (
 			currentlyPlayingChannelSection = clickedButton.parentElement;
 			paintChannelSection(currentlyPlayingChannelSection);
 			if (clickedButton.classList.contains('channel__play')) {
-				const channelUrl = clickedButton.dataset.url;
-				if (isYoutubeUrl(channelUrl)) {
-					hideElement(video);
-					showElement(youtubePlayer);
-					loadVideoYoutube(channelUrl, youtubePlayer);
-				} else {
-					hideElement(youtubePlayer);
-					clearSrcElement(youtubePlayer);
-					showElement(video);
-					loadPlaylistM3U(channelUrl, video);
-				}
+				setupLoadChannelButton(clickedButton, video, youtubePlayer);
 			}
 			if (clickedButton.classList.contains('channel__favorite')) {
 				setupFavoriteButton(
 					clickedButton,
-					JSON.parse(clickedButton.dataset.info)
+					JSON.parse(clickedButton.dataset.info),
+					renderFavorites
 				);
 			}
 		}
 	});
 };
 
-const setupFavoriteButton = (favoriteButton, channelData) => {
+const setupLoadChannelButton = (clickedButton, video, youtubePlayer) => {
+	const channelUrl = clickedButton.dataset.url;
+	if (isYoutubeUrl(channelUrl)) {
+		hideElement(video);
+		showElement(youtubePlayer);
+		loadVideoYoutube(channelUrl, youtubePlayer);
+	} else {
+		hideElement(youtubePlayer);
+		clearSrcElement(youtubePlayer);
+		showElement(video);
+		loadPlaylistM3U(channelUrl, video);
+	}
+};
+
+const setupFavoriteButton = (favoriteButton, channelData, renderFavorites) => {
 	let favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
 	if (favoriteChannels) {
 		const isCurrentlyFavorite = favoriteChannels.some(
@@ -186,17 +193,39 @@ const setupFavoriteButton = (favoriteButton, channelData) => {
 			favoriteChannels = favoriteChannels.filter(
 				(favoriteChannel) => favoriteChannel.tvgId !== channelData.tvgId
 			);
-			favoriteButton.innerText = '♡';
+			localStorage.setItem(
+				'favoriteChannels',
+				JSON.stringify(favoriteChannels)
+			);
+			const allChannelsSection = favoriteButton.closest('#allChannels');
+			const favoritesSection = favoriteButton.closest('#favorites');
+			if (allChannelsSection) {
+				favoriteButton.innerText = '♡';
+				renderFavorites();
+			} else if (favoritesSection) {
+				favoriteButton.parentElement.remove();
+				const existInAllChannels = document.getElementById(
+					'fb_' + channelData.tvgId
+				);
+				if (existInAllChannels) {
+					existInAllChannels.innerText = '♡';
+				}
+			}
 		} else {
 			favoriteChannels.push(channelData);
 			favoriteButton.innerText = '♥';
+
+			localStorage.setItem(
+				'favoriteChannels',
+				JSON.stringify(favoriteChannels)
+			);
+			renderFavorites();
 		}
 	} else {
 		favoriteChannels = [];
 		favoriteChannels.push(channelData);
+		localStorage.setItem('favoriteChannels', JSON.stringify(favoriteChannels));
 	}
-
-	localStorage.setItem('favoriteChannels', JSON.stringify(favoriteChannels));
 };
 
 const unpaintChannelSection = (channelSection) => {
@@ -333,7 +362,7 @@ if (Hls.isSupported()) {
 	var hls = new Hls();
 	const sectionFavorites = document.getElementById('favorites');
 	const sectionAllChannels = document.getElementById('allChannels');
-	const favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
+	let favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
 	const urlM3U = localStorage.getItem('urlM3U');
 	const toggleListButton = document.getElementById('toggleListButton');
 	const video = document.getElementById('video');
@@ -404,7 +433,7 @@ if (Hls.isSupported()) {
 
 	function renderAllChannels() {
 		if (urlM3U) {
-			allChannelsControl = defaultControl;
+			allChannelsControl = { ...defaultControl };
 			sectionAllChannels.innerHTML = '';
 			fetchM3UFile(urlM3U).then((fileM3U) => {
 				const channels = getChannels(fileM3U);
@@ -429,23 +458,32 @@ if (Hls.isSupported()) {
 
 	renderAllChannels();
 
-	if (favoriteChannels) {
-		favoritesControl.loadedChannelsCount = addChannelsSections(
-			favoritesControl.loadedChannelsCount,
-			favoritesControl.initialLoadCount,
-			favoriteChannels,
-			buildChannelSection,
-			sectionFavorites
+	function renderFavorites() {
+		favoritesControl = { ...defaultControl };
+		sectionFavorites.innerHTML = '';
+		favoriteChannels = favoriteChannels = JSON.parse(
+			localStorage.getItem('favoriteChannels')
 		);
+		if (favoriteChannels) {
+			favoritesControl.loadedChannelsCount = addChannelsSections(
+				favoritesControl.loadedChannelsCount,
+				favoritesControl.initialLoadCount,
+				favoriteChannels,
+				buildChannelSection,
+				sectionFavorites
+			);
 
-		setupInfiniteScroll(
-			sectionFavorites,
-			favoritesControl,
-			addChannelsSections,
-			buildChannelSection,
-			favoriteChannels
-		);
+			setupInfiniteScroll(
+				sectionFavorites,
+				favoritesControl,
+				addChannelsSections,
+				buildChannelSection,
+				favoriteChannels
+			);
+		}
 	}
+
+	renderFavorites();
 
 	setupToggleChannelsList(
 		isSectionFavoritesVisible,
@@ -463,7 +501,8 @@ if (Hls.isSupported()) {
 		youtubePlayer,
 		currentlyPlayingChannelSection,
 		unpaintChannelSection,
-		paintChannelSection
+		paintChannelSection,
+		renderFavorites
 	);
 
 	setupChannelClickListener(
@@ -472,7 +511,8 @@ if (Hls.isSupported()) {
 		youtubePlayer,
 		currentlyPlayingChannelSection,
 		unpaintChannelSection,
-		paintChannelSection
+		paintChannelSection,
+		renderFavorites
 	);
 
 	setupAutoplay(video);
