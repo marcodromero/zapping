@@ -112,12 +112,6 @@ const loadPlaylistM3U = (url, video) => {
 	hls.attachMedia(video);
 };
 
-const loadVideoYoutube = (url, youtubePlayer) => {
-	hls.loadSource('');
-	hls.attachMedia(video);
-	youtubePlayer.src = url + '?autoplay=1';
-};
-
 const showElement = (element) => {
 	element.classList.remove('hidden');
 };
@@ -130,11 +124,6 @@ const clearSrcElement = (element) => {
 	element.src = '';
 };
 
-const isYoutubeUrl = (url) => {
-	const regexYoutube = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\b/;
-	return regexYoutube.test(url);
-};
-
 const setTextButton = (button, text) => {
 	button.innerText = text;
 };
@@ -142,11 +131,10 @@ const setTextButton = (button, text) => {
 const setupChannelClickListener = (
 	channelsContainer,
 	video,
-	youtubePlayer,
 	currentlyPlayingChannelSection,
 	unpaintChannelSection,
 	paintChannelSection,
-	renderFavorites
+	renderFavoritesChannels
 ) => {
 	channelsContainer.addEventListener('click', (event) => {
 		const clickedButton = event.target.closest('.channel__button');
@@ -156,34 +144,30 @@ const setupChannelClickListener = (
 			currentlyPlayingChannelSection = clickedButton.parentElement;
 			paintChannelSection(currentlyPlayingChannelSection);
 			if (clickedButton.classList.contains('channel__play')) {
-				setupLoadChannelButton(clickedButton, video, youtubePlayer);
+				setupLoadChannelButton(clickedButton, video);
 			}
 			if (clickedButton.classList.contains('channel__favorite')) {
 				setupFavoriteButton(
 					clickedButton,
 					JSON.parse(clickedButton.dataset.info),
-					renderFavorites
+					renderFavoritesChannels
 				);
 			}
 		}
 	});
 };
 
-const setupLoadChannelButton = (clickedButton, video, youtubePlayer) => {
+const setupLoadChannelButton = (clickedButton, video) => {
 	const channelUrl = clickedButton.dataset.url;
-	if (isYoutubeUrl(channelUrl)) {
-		hideElement(video);
-		showElement(youtubePlayer);
-		loadVideoYoutube(channelUrl, youtubePlayer);
-	} else {
-		hideElement(youtubePlayer);
-		clearSrcElement(youtubePlayer);
-		showElement(video);
-		loadPlaylistM3U(channelUrl, video);
-	}
+	showElement(video);
+	loadPlaylistM3U(channelUrl, video);
 };
 
-const setupFavoriteButton = (favoriteButton, channelData, renderFavorites) => {
+const setupFavoriteButton = (
+	favoriteButton,
+	channelData,
+	renderFavoritesChannels
+) => {
 	let favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
 	if (favoriteChannels) {
 		const isCurrentlyFavorite = favoriteChannels.some(
@@ -201,7 +185,7 @@ const setupFavoriteButton = (favoriteButton, channelData, renderFavorites) => {
 			const favoritesSection = favoriteButton.closest('#favorites');
 			if (allChannelsSection) {
 				favoriteButton.innerText = '♡';
-				renderFavorites();
+				renderFavoritesChannels();
 			} else if (favoritesSection) {
 				favoriteButton.parentElement.remove();
 				const existInAllChannels = document.getElementById(
@@ -219,7 +203,7 @@ const setupFavoriteButton = (favoriteButton, channelData, renderFavorites) => {
 				'favoriteChannels',
 				JSON.stringify(favoriteChannels)
 			);
-			renderFavorites();
+			renderFavoritesChannels();
 		}
 	} else {
 		favoriteChannels = [];
@@ -292,12 +276,11 @@ const setupConfirmLoadButton = (
 ) => {
 	confirmLoadButton.addEventListener('click', async () => {
 		try {
-			const response = await fetch(inputURLM3U.value);
-			if (response.status === 200) {
+			await fetchM3UFile(inputURLM3U.value).then((fileM3U) => {
 				localStorage.setItem('urlM3U', inputURLM3U.value);
-				renderAllChannels();
+				renderAllChannels(localStorage.getItem('urlM3U'));
 				msgSuccess.classList.remove('hidden');
-			}
+			});
 		} catch (error) {
 			msgError.classList.remove('hidden');
 		}
@@ -362,11 +345,8 @@ if (Hls.isSupported()) {
 	var hls = new Hls();
 	const sectionFavorites = document.getElementById('favorites');
 	const sectionAllChannels = document.getElementById('allChannels');
-	let favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
-	let urlM3U = localStorage.getItem('urlM3U');
 	const toggleListButton = document.getElementById('toggleListButton');
 	const video = document.getElementById('video');
-	const youtubePlayer = document.getElementById('youtubePlayer');
 	const loadListButton = document.getElementById('loadListButton');
 	const cancelLoadButton = document.getElementById('cancelLoadButton');
 	const loadListDialog = document.getElementById('loadListDialog');
@@ -374,6 +354,7 @@ if (Hls.isSupported()) {
 	const msgError = document.getElementById('loadListDialog__error');
 	const msgSuccess = document.getElementById('loadListDialog__success');
 	const inputURLM3U = document.getElementById('inputAddURLM3U');
+	let favoriteChannels = JSON.parse(localStorage.getItem('favoriteChannels'));
 	let isSectionFavoritesVisible = false;
 	let currentlyPlayingChannelSection = null;
 	const defaultControl = {
@@ -431,9 +412,7 @@ if (Hls.isSupported()) {
 		return (initialIndex += amount);
 	};
 
-	function renderAllChannels() {
-		urlM3U = localStorage.getItem('urlM3U');
-
+	function renderAllChannels(urlM3U) {
 		if (urlM3U) {
 			fetchM3UFile(urlM3U).then((fileM3U) => {
 				const channels = getChannels(fileM3U);
@@ -458,9 +437,9 @@ if (Hls.isSupported()) {
 		}
 	}
 
-	renderAllChannels();
+	renderAllChannels(localStorage.getItem('urlM3U'));
 
-	function renderFavorites() {
+	function renderFavoritesChannels() {
 		favoriteChannels = favoriteChannels = JSON.parse(
 			localStorage.getItem('favoriteChannels')
 		);
@@ -485,7 +464,7 @@ if (Hls.isSupported()) {
 		}
 	}
 
-	renderFavorites();
+	renderFavoritesChannels();
 
 	setupToggleChannelsList(
 		isSectionFavoritesVisible,
@@ -500,21 +479,19 @@ if (Hls.isSupported()) {
 	setupChannelClickListener(
 		sectionAllChannels,
 		video,
-		youtubePlayer,
 		currentlyPlayingChannelSection,
 		unpaintChannelSection,
 		paintChannelSection,
-		renderFavorites
+		renderFavoritesChannels
 	);
 
 	setupChannelClickListener(
 		sectionFavorites,
 		video,
-		youtubePlayer,
 		currentlyPlayingChannelSection,
 		unpaintChannelSection,
 		paintChannelSection,
-		renderFavorites
+		renderFavoritesChannels
 	);
 
 	setupAutoplay(video);
