@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Alert from './Alert';
-import Navbar from './Navbar';
-import updateM3UURL from '../utils/updateM3UUrl';
+import updateM3UURL from '../utils/updateM3UURL';
 
 export default function Modal({ isOpen, closeModal }) {
 	const dialogRef = useRef(null);
