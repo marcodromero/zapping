@@ -5,7 +5,7 @@ import Channel from './Channel';
 export default function ChannelsList({ handlePlayerSelect }) {
 	const [channels, setChannels] = useState([]);
 
-	async function addChannelsToList() {
+	async function getChannelsData() {
 		const data = await getChannels();
 		if (data) {
 			setChannels(data);
@@ -13,7 +13,7 @@ export default function ChannelsList({ handlePlayerSelect }) {
 	}
 
 	useEffect(() => {
-		addChannelsToList();
+		getChannelsData();
 	}, []);
 
 	return (
