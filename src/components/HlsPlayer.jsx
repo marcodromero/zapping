@@ -1,10 +1,16 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 
 export default function HlsPlayer({ url }) {
 	const videoRef = useRef(null);
-	const hls = new window.Hls();
-	hls.loadSource(url);
-	hls.attachMedia(videoRef.current);
+
+	useEffect(() => {
+		if (window.Hls) {
+			const hls = new window.Hls();
+			hls.loadSource(url);
+			hls.attachMedia(videoRef.current);
+		}
+	}, [url]);
+
 	return (
 		<video
 			ref={videoRef}
