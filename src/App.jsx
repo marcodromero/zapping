@@ -49,13 +49,13 @@ function App() {
 				}}
 			>
 				{showYoutubePlayer && currentVideoUrl && (
-					<YoutubePlayer url={getYoutubeChannelId(currentVideoUrl)} />
+					<YoutubePlayer channel={getYoutubeChannelId(currentVideoUrl)} />
 				)}
 				{showHLSPlayer && currentVideoUrl && (
 					<HlsPlayer url={currentVideoUrl} />
 				)}
 				{showTwitchPlayer && currentVideoUrl && (
-					<TwitchPlayer url={getTwitchChannelName(currentVideoUrl)} />
+					<TwitchPlayer channel={getTwitchChannelName(currentVideoUrl)} />
 				)}
 			</div>
 			<Navbar openModal={openModal} />
