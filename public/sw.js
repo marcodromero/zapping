@@ -24,7 +24,12 @@ self.addEventListener('fetch', (event) => {
 	event.respondWith(
 		caches.match(event.request).then((cachedResponse) => {
 			if (event.request.mode === 'navigate') {
-				return caches.match('/index.html') || fetch(event.request);
+				return caches.match('/index.html').then((indexCacheResponse) => {
+					if (indexCacheResponse) {
+						return indexCacheResponse;
+					}
+					return fetch(event.request);
+				});
 			}
 
 			if (cachedResponse) {
@@ -35,14 +40,16 @@ self.addEventListener('fetch', (event) => {
 				.then((networkResponse) => {
 					const responseToCache = networkResponse.clone();
 
-					caches.open(cacheName).then((cache) => {
-						cache.put(event.request, responseToCache);
-					});
+					if (networkResponse && networkResponse.status === 200) {
+						caches.open(cacheName).then((cache) => {
+							cache.put(event.request, responseToCache);
+						});
+					}
 
 					return networkResponse;
 				})
 				.catch(() => {
-					console.log('Fallo de red.');
+					console.log('Fallo de red para:', event.request.url);
 				});
 		})
 	);
