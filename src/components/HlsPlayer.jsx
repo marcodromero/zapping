@@ -4,15 +4,24 @@ export default function HlsPlayer({ url }) {
 	const videoRef = useRef(null);
 
 	useEffect(() => {
-		if (window.Hls) {
+		const videoElement = videoRef.current;
+
+		if (window.Hls && videoElement) {
 			const hls = new window.Hls();
+
 			hls.loadSource(url);
-			hls.attachMedia(videoRef.current);
+			hls.attachMedia(videoElement);
 
 			return () => {
 				hls.destroy();
+				videoElement.pause();
+				videoElement.removeAttribute('src');
+				videoElement.load();
+				videoElement.src = '';
 			};
 		}
+
+		return;
 	}, [url]);
 
 	return (

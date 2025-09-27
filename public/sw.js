@@ -21,6 +21,18 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+	const url = event.request.url;
+
+	if (
+		url.includes('.m3u8') ||
+		url.includes('.ts') ||
+		url.includes('.m4s') ||
+		url.includes('.aac') ||
+		url.includes('.mp4')
+	) {
+		return event.respondWith(fetch(event.request));
+	}
+
 	event.respondWith(
 		caches.match(event.request).then((cachedResponse) => {
 			if (event.request.mode === 'navigate') {
@@ -40,7 +52,11 @@ self.addEventListener('fetch', (event) => {
 				.then((networkResponse) => {
 					const responseToCache = networkResponse.clone();
 
-					if (networkResponse && networkResponse.status === 200) {
+					if (
+						networkResponse &&
+						networkResponse.status === 200 &&
+						event.request.method === 'GET'
+					) {
 						caches.open(cacheName).then((cache) => {
 							cache.put(event.request, responseToCache);
 						});
