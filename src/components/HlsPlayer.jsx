@@ -8,6 +8,10 @@ export default function HlsPlayer({ url }) {
 			const hls = new window.Hls();
 			hls.loadSource(url);
 			hls.attachMedia(videoRef.current);
+
+			return () => {
+				hls.destroy();
+			};
 		}
 	}, [url]);
 
