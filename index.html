@@ -1,34 +1,33 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta
-			http-equiv="Content-Security-Policy"
-			content="default-src 'self'; connect-src 'self' *; script-src 'self' 'unsafe-inline' https://embed.twitch.tv https://cdn.jsdelivr.net;  img-src 'self' *; style-src 'self' 'unsafe-inline'; media-src * blob:; frame-src 'self' https://www.youtube.com https://player.twitch.tv; worker-src 'self' blob:;"
-		/>
-		<link rel="stylesheet" href="./index.css" />
-		<link rel="manifest" href="./manifest.json" />
-		<title>Zapping</title>
-	</head>
-	<body>
-		<div id="root"></div>
-		<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
-		<script src="https://embed.twitch.tv/embed/v1.js"></script>
-		<script type="module" src="/src/main.jsx"></script>
-		<script>
-			if ('serviceWorker' in navigator) {
-				window.addEventListener('load', () => {
-					navigator.serviceWorker
-						.register('/sw.js')
-						.then((registration) => {
-							console.log('Service Worker registrado con éxito:', registration);
-						})
-						.catch((error) => {
-							console.log('Error al registrar el Service Worker:', error);
-						});
-				});
-			}
-		</script>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src 'self' *; script-src 'self' 'unsafe-inline' https://embed.twitch.tv https://cdn.jsdelivr.net;  img-src 'self' *; style-src 'self' 'unsafe-inline'; media-src * blob:; frame-src 'self' https://www.youtube.com https://player.twitch.tv; worker-src 'self' blob:;"
+    />
+    <link rel="stylesheet" href="./index.css" />
+    <link rel="manifest" href="./manifest.json" />
+    <title>Zapping</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://embed.twitch.tv/embed/v1.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+              console.log('Service Worker registrado con éxito:', registration);
+            })
+            .catch((error) => {
+              console.log('Error al registrar el Service Worker:', error);
+            });
+        });
+      }
+    </script>
+  </body>
 </html>
