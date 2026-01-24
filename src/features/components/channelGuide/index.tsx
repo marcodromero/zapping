@@ -9,6 +9,7 @@ type ChannelType = {
   group: string;
   name: string;
   url: string;
+  player: 'twitch' | 'youtube' | 'hls' | '';
 };
 
 export default function ChannelGuide() {
@@ -17,7 +18,6 @@ export default function ChannelGuide() {
   async function getChannelsData() {
     const data = await getChannels();
     if (data) {
-      console.log('Channels fetched:', data);
       setChannels(data);
     }
   }
@@ -38,6 +38,7 @@ export default function ChannelGuide() {
         <ChannelCard
           channelName={channel.name}
           url={channel.url}
+          playerType={channel.player}
           tvgLogo={channel.tvgLogo}
           key={index}
         />

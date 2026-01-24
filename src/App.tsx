@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Player from './features/components/player';
 import ChannelGuide from './features/components/channelGuide';
 import Toolbar from './features/components/toolbar';
@@ -6,10 +5,6 @@ import Modal from './features/components/modal';
 import imageStatic from './assets/images/bg-tv.jpg';
 
 function App() {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
   return (
     <div className='bg-black flex items-center flex-col h-dvh'>
       <div
@@ -21,9 +16,9 @@ function App() {
       >
         <Player />
       </div>
-      <Toolbar openModal={openModal} />
+      <Toolbar />
       <ChannelGuide />
-      <Modal isOpen={isModalOpen} closeModal={closeModal} />
+      <Modal />
     </div>
   );
 }

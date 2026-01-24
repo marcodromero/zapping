@@ -5,20 +5,26 @@ type ChannelCardProps = {
   url: string;
   tvgLogo: string;
   channelName: string;
+  playerType: 'twitch' | 'youtube' | 'hls' | '';
 };
 
 type ChannelStore = {
   currentChannelUrl: string;
   setCurrentChannelUrl: (url: string) => void;
+  setPlayerType: (type: 'twitch' | 'youtube' | 'hls' | '') => void;
 };
 
 export default function ChannelCard({
   url,
+  playerType,
   tvgLogo,
   channelName,
 }: ChannelCardProps) {
   const setCurrentChannelUrl = useChannelStore(
     (state: ChannelStore) => state.setCurrentChannelUrl,
+  );
+  const setPlayerType = useChannelStore(
+    (state: ChannelStore) => state.setPlayerType,
   );
 
   return (
@@ -27,13 +33,11 @@ export default function ChannelCard({
       onClick={() => {
         vibrateDevice();
         setCurrentChannelUrl(url);
+        setPlayerType(playerType);
       }}
     >
       <img className='lazy w-15 h-full object-contain' src={tvgLogo} />
-      <p className='text-[#c0c6c9] ml-4 text-xs truncate'>
-        {channelName}
-        {url}
-      </p>
+      <p className='text-[#c0c6c9] ml-4 text-xs truncate'>{channelName}</p>
     </button>
   );
 }

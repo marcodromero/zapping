@@ -1,10 +1,9 @@
-type ToolbarProps = {
-  openModal: () => void;
-};
+import { useModalStore } from '../../../store/modalStore';
 
-export default function Toolbar({ openModal }: ToolbarProps) {
+export default function Toolbar() {
+  const openModal = useModalStore((state) => state.openModal);
   return (
-    <nav className='w-full flex flex-col h-full'>
+    <section className='w-full flex flex-col h-full'>
       <div className='flex justify-around items-center p-4 bg-[#1d1e22] text-sm border-b-1 border-b-[#121414] border-t border-t-[#222626] h-[100%] '>
         <button
           className='bg-[#4d4c0d] text-[#acaead] border-2 border-[#565958] rounded-lg p-1 flex items-center h-8 font-bold text-[11px]'
@@ -14,6 +13,6 @@ export default function Toolbar({ openModal }: ToolbarProps) {
           CARGAR LISTA DE CANALES
         </button>
       </div>
-    </nav>
+    </section>
   );
 }

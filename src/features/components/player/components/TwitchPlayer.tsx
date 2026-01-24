@@ -1,13 +1,7 @@
 type TwitchPlayerProps = {
-  channel: string | null;
+  url: string;
 };
 
-export default function TwitchPlayer({ channel }: TwitchPlayerProps) {
-  return (
-    <iframe
-      src={`https://player.twitch.tv/?channel=${channel}&parent=zapping-sooty.vercel.app&muted=false`}
-      allowFullScreen
-      className='h-full w-full'
-    ></iframe>
-  );
+export default function TwitchPlayer({ url }: TwitchPlayerProps) {
+  return <iframe src={url} allowFullScreen className='h-full w-full'></iframe>;
 }

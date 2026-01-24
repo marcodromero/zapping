@@ -1,13 +1,11 @@
 import { useEffect, useRef } from 'react';
 import Alert from './components/Alert';
 import updateM3UURL from './utils/updateM3UURL';
+import { useModalStore } from '../../../store/modalStore';
 
-type ModalProps = {
-  isOpen: boolean;
-  closeModal: () => void;
-};
-
-export default function Modal({ isOpen, closeModal }: ModalProps) {
+export default function Modal() {
+  const isOpen = useModalStore((state) => state.isModalOpen);
+  const closeModal = useModalStore((state) => state.closeModal);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 

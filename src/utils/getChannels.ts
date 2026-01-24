@@ -1,3 +1,5 @@
+import getTwitchUrl from './getTwitchUrl';
+import getYoutubeUrl from './getYoutubeUrl';
 import { isM3UPlaylist } from './validators';
 
 type ChannelType = {
@@ -7,6 +9,7 @@ type ChannelType = {
   group: string;
   name: string;
   url: string;
+  player: 'twitch' | 'youtube' | 'hls' | '';
 };
 
 const regexMetadata =
@@ -27,15 +30,19 @@ export default async function getChannels(): Promise<
 
   let channels: ChannelType[] = [];
   let currentMetadata: ChannelType | null = null;
-
+  let channelUrl: string = '';
+  let metadataMatch: RegExpMatchArray | null;
+  let urlMatch: RegExpMatchArray | null;
+  let trimmedLine: string = '';
   let lines = content.split('\n');
+  let player: 'twitch' | 'youtube' | 'hls' | '' = '';
 
   for (const line of lines) {
-    const trimmedLine = line.trim();
+    trimmedLine = line.trim();
     if (!trimmedLine) continue;
 
-    const metadataMatch = trimmedLine.match(regexMetadata);
-    let urlMatch = trimmedLine.match(regexURL);
+    metadataMatch = trimmedLine.match(regexMetadata);
+    urlMatch = trimmedLine.match(regexURL);
 
     if (metadataMatch) {
       currentMetadata = {
@@ -45,11 +52,27 @@ export default async function getChannels(): Promise<
         group: metadataMatch[4],
         name: metadataMatch[5].trim(),
         url: '',
+        player: '',
       };
     } else if (currentMetadata && urlMatch) {
+      if (urlMatch[0].includes('twitch.tv')) {
+        channelUrl = getTwitchUrl(urlMatch[0]);
+        player = 'twitch';
+      } else if (
+        urlMatch[0].includes('youtube.com') ||
+        urlMatch[0].includes('youtu.be')
+      ) {
+        channelUrl = getYoutubeUrl(urlMatch[0]);
+        player = 'youtube';
+      } else {
+        channelUrl = urlMatch[0];
+        player = 'hls';
+      }
+
       channels.push({
         ...currentMetadata,
-        url: urlMatch[0],
+        url: channelUrl,
+        player,
       });
 
       currentMetadata = null;
