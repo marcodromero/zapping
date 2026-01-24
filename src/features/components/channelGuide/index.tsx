@@ -2,10 +2,6 @@ import { useEffect, useState } from 'react';
 import getChannels from '../../../utils/getChannels';
 import ChannelCard from './components/ChannelCard';
 
-type ChannelGuideProps = {
-  handlePlayerSelect: (url: string) => void;
-};
-
 type ChannelType = {
   duration: number;
   tvgId: string;
@@ -15,9 +11,7 @@ type ChannelType = {
   url: string;
 };
 
-export default function ChannelGuide({
-  handlePlayerSelect,
-}: ChannelGuideProps) {
+export default function ChannelGuide() {
   const [channels, setChannels] = useState<ChannelType[]>([]);
 
   async function getChannelsData() {
@@ -46,7 +40,6 @@ export default function ChannelGuide({
           url={channel.url}
           tvgLogo={channel.tvgLogo}
           key={index}
-          handlePlayerSelect={handlePlayerSelect}
         />
       ))}
     </section>
