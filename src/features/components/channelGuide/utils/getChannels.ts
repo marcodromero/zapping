@@ -1,6 +1,7 @@
 import getTwitchUrl from './getTwitchUrl';
 import getYoutubeUrl from './getYoutubeUrl';
-import { isM3UPlaylist } from './validators';
+import { isM3UPlaylist } from '../../../../utils/validators';
+import type { playerType } from '../../../../types/channelTypes';
 
 type ChannelType = {
   duration: number;
@@ -9,7 +10,7 @@ type ChannelType = {
   group: string;
   name: string;
   url: string;
-  player: 'twitch' | 'youtube' | 'hls' | '';
+  player: playerType;
 };
 
 const regexMetadata =
@@ -52,7 +53,7 @@ export default async function getChannels(): Promise<
         group: metadataMatch[4],
         name: metadataMatch[5].trim(),
         url: '',
-        player: '',
+        player: undefined,
       };
     } else if (currentMetadata && urlMatch) {
       if (urlMatch[0].includes('twitch.tv')) {
@@ -78,5 +79,6 @@ export default async function getChannels(): Promise<
       currentMetadata = null;
     }
   }
+
   return channels;
 }

@@ -1,48 +1,73 @@
-import { useEffect, useState } from 'react';
-import getChannels from '../../../utils/getChannels';
+import { useEffect, useRef } from 'react';
 import ChannelCard from './components/ChannelCard';
-
-type ChannelType = {
-  duration: number;
-  tvgId: string;
-  tvgLogo: string;
-  group: string;
-  name: string;
-  url: string;
-  player: 'twitch' | 'youtube' | 'hls' | '';
-};
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useChannelStore } from '../../../store/channelStore';
 
 export default function ChannelGuide() {
-  const [channels, setChannels] = useState<ChannelType[]>([]);
+  const channels = useChannelStore((state) => state.channels);
+  const fetchChannels = useChannelStore((state) => state.fetchChannels);
+  const parentRef = useRef(null);
 
-  async function getChannelsData() {
-    const data = await getChannels();
-    if (data) {
-      setChannels(data);
-    }
-  }
+  const rowVirtualizer = useVirtualizer({
+    count: channels?.length ?? 0,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 55,
+    overscan: 5,
+  });
 
   useEffect(() => {
-    getChannelsData();
-  }, []);
+    fetchChannels();
+  }, [fetchChannels]);
 
   return (
     <section
-      className={
-        channels.length !== 0
-          ? 'flex flex-wrap content-start overflow-auto bg-[#3c4248] min-h-6/10 max-h-6/10'
-          : 'flex flex-wrap content-start overflow-auto bg-[#3c4248] h-0/10'
-      }
+      ref={parentRef}
+      className='relative overflow-auto bg-[#3c4248] w-full h-6/10'
     >
-      {channels.map((channel, index) => (
-        <ChannelCard
-          channelName={channel.name}
-          url={channel.url}
-          playerType={channel.player}
-          tvgLogo={channel.tvgLogo}
-          key={index}
-        />
-      ))}
+      {!channels && (
+        <div className='absolute inset-0 flex items-center justify-center text-white animate-pulse'>
+          Cargando canales...
+        </div>
+      )}
+
+      {channels && channels.length === 0 && (
+        <div className='p-4 text-white'>No se encontraron canales.</div>
+      )}
+
+      {channels && channels.length > 0 && (
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualItem, index) => {
+            const channel = channels[virtualItem.index];
+            return (
+              <div
+                key={virtualItem.key}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${virtualItem.size}px`,
+                  transform: `translateY(${virtualItem.start}px)`,
+                }}
+              >
+                <ChannelCard
+                  name={channel.name}
+                  url={channel.url}
+                  player={channel.player}
+                  tvgLogo={channel.tvgLogo}
+                  key={index}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }

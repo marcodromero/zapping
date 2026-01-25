@@ -8,7 +8,7 @@ function App() {
   return (
     <div className='bg-black flex items-center flex-col h-dvh'>
       <div
-        className='flex justify-center w-full min-h-3/10 max-h-3/10 bg-no-repeat bg-center '
+        className='flex justify-center w-full h-3/10 bg-no-repeat bg-center '
         style={{
           backgroundImage: `url(${imageStatic})`,
           backgroundSize: 'contain',

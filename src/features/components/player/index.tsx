@@ -5,10 +5,10 @@ import TwitchPlayer from './components/TwitchPlayer';
 
 export default function Player() {
   const currentChannelUrl = useChannelStore((state) => state.currentChannelUrl);
-  const playerType = useChannelStore((state) => state.playerType);
-  if (playerType === 'youtube') {
+  const player = useChannelStore((state) => state.player);
+  if (player === 'youtube') {
     return <YoutubePlayer url={currentChannelUrl} />;
-  } else if (playerType === 'twitch') {
+  } else if (player === 'twitch') {
     return <TwitchPlayer url={currentChannelUrl} />;
   } else {
     return <HlsPlayer url={currentChannelUrl} />;

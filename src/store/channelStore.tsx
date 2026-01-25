@@ -1,17 +1,24 @@
 import { create } from 'zustand';
+import type { ChannelType, playerType } from '../types/channelTypes';
+import getChannels from '../features/components/channelGuide/utils/getChannels';
 
 type ChannelStore = {
   currentChannelUrl: string;
-  playerType: 'twitch' | 'youtube' | 'hls' | '';
+  player: playerType;
   setCurrentChannelUrl: (url: string) => void;
-  setPlayerType: (type: 'twitch' | 'youtube' | 'hls' | '') => void;
+  setPlayer: (type: playerType) => void;
+  channels: ChannelType[] | undefined;
+  fetchChannels: () => Promise<void>;
 };
 
 export const useChannelStore = create<ChannelStore>((set) => ({
+  channels: undefined,
   currentChannelUrl: '',
-  playerType: '',
-  setCurrentChannelUrl: (url: string) =>
-    set(() => ({ currentChannelUrl: url })),
-  setPlayerType: (type: 'twitch' | 'youtube' | 'hls' | '') =>
-    set(() => ({ playerType: type })),
+  player: undefined,
+  setCurrentChannelUrl: (url) => set(() => ({ currentChannelUrl: url })),
+  setPlayer: (type: playerType) => set(() => ({ player: type })),
+  fetchChannels: async () => {
+    const data = await getChannels();
+    set({ channels: data });
+  },
 }));
