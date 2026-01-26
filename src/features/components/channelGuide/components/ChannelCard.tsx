@@ -14,14 +14,19 @@ export default function ChannelCard({
   tvgLogo,
   name,
 }: ChannelCardProps) {
+  const currentChannelUrl = useChannelStore((state) => state.currentChannelUrl);
   const setCurrentChannelUrl = useChannelStore(
     (state) => state.setCurrentChannelUrl,
   );
   const setPlayer = useChannelStore((state) => state.setPlayer);
 
+  const isActive = currentChannelUrl === url;
+
   return (
     <button
-      className='w-full  p-2 flex channel__button channel__play items-center h-full border-t-1 border-t-[#29374d]  border-b-2 border-b-[#0e121a] bg-[#1c2534] hover:bg-[#3a6280] channel'
+      className={`w-full  p-2 flex channel__button channel__play items-center h-full border-t-1 border-t-[#29374d]  border-b-2 border-b-[#0e121a] channel 
+        ${isActive ? 'bg-[#3a6280] ' : 'bg-[#1c2534] hover:bg-[#2a374a]'}
+        `}
       onClick={() => {
         vibrateDevice();
         setCurrentChannelUrl(url);
