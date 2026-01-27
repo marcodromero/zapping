@@ -9,6 +9,8 @@ type ChannelStore = {
   setPlayer: (type: playerType) => void;
   channels: ChannelType[] | undefined;
   fetchChannels: () => Promise<void>;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
 };
 
 export const useChannelStore = create<ChannelStore>((set) => ({
@@ -21,4 +23,6 @@ export const useChannelStore = create<ChannelStore>((set) => ({
     const data = await getChannels();
     set({ channels: data });
   },
+  searchTerm: '',
+  setSearchTerm: (searchTerm) => set({ searchTerm }),
 }));
