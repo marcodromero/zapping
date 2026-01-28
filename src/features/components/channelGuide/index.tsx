@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from 'react';
 import ChannelCard from './components/ChannelCard';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useChannelStore } from '../../../store/channelStore';
-import { useAlertStore } from '../../../store/alertStore';
 
 export default function ChannelGuide() {
   const channels = useChannelStore((state) => state.channels);

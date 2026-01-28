@@ -27,7 +27,6 @@ export default async function savePlaylist(
 
     if (!response) {
       showAlert('error');
-
       return false;
     }
 
@@ -35,10 +34,23 @@ export default async function savePlaylist(
 
     if (!isM3UPlaylist(content)) {
       showAlert('error');
-
       return false;
     }
-    localStorage.setItem('url', url);
+
+    const oldData = localStorage.getItem('url');
+
+    const rawData = localStorage.getItem('playlists');
+    let savedPlaylists: string[] = rawData ? JSON.parse(rawData) : [];
+
+    //si existen datos de la version antigua de la app los vuelca al array
+    if (oldData) {
+      savedPlaylists.push(oldData);
+      localStorage.removeItem(url);
+    }
+
+    savedPlaylists.push(url);
+    localStorage.setItem('playlists', JSON.stringify(savedPlaylists));
+
     await fetchChannels();
     useModalStore.setState({ isActive: false });
     return true;

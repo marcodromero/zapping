@@ -20,14 +20,16 @@ const regexURL = /(https?:\/\/[^\s]+)/g;
 export default async function getChannels(): Promise<
   ChannelType[] | undefined
 > {
-  const url = localStorage.getItem('url');
-  if (!url) return;
+  const oldRawData = localStorage.getItem('url');
 
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Error al obtener el archivo M3U.');
-  const content = await response.text();
+  if (oldRawData) {
+    localStorage.setItem('playlists', JSON.stringify([oldRawData]));
+    localStorage.removeItem('url');
+  }
 
-  if (!isM3UPlaylist(content)) throw Error('No es un M3U valido.');
+  const rawData = localStorage.getItem('playlists');
+  if (!rawData) return;
+  const playlists = JSON.parse(rawData);
 
   let channels: ChannelType[] = [];
   let currentMetadata: ChannelType | null = null;
@@ -35,49 +37,60 @@ export default async function getChannels(): Promise<
   let metadataMatch: RegExpMatchArray | null;
   let urlMatch: RegExpMatchArray | null;
   let trimmedLine: string = '';
-  let lines = content.split('\n');
   let player: 'twitch' | 'youtube' | 'hls' | '' = '';
 
-  for (const line of lines) {
-    trimmedLine = line.trim();
-    if (!trimmedLine) continue;
+  //////
+  for (const playlist of playlists) {
+    const response = await fetch(playlist);
+    if (!response.ok) throw new Error('Error al obtener el archivo M3U.');
+    const content = await response.text();
 
-    metadataMatch = trimmedLine.match(regexMetadata);
-    urlMatch = trimmedLine.match(regexURL);
+    if (!isM3UPlaylist(content)) throw Error('No es un M3U valido.');
 
-    if (metadataMatch) {
-      currentMetadata = {
-        duration: parseInt(metadataMatch[1]),
-        tvgId: metadataMatch[2],
-        tvgLogo: metadataMatch[3],
-        group: metadataMatch[4],
-        name: metadataMatch[5].trim(),
-        url: '',
-        player: undefined,
-      };
-    } else if (currentMetadata && urlMatch) {
-      if (urlMatch[0].includes('twitch.tv')) {
-        channelUrl = getTwitchUrl(urlMatch[0]);
-        player = 'twitch';
-      } else if (
-        urlMatch[0].includes('youtube.com') ||
-        urlMatch[0].includes('youtu.be')
-      ) {
-        channelUrl = getYoutubeUrl(urlMatch[0]);
-        player = 'youtube';
-      } else {
-        channelUrl = urlMatch[0];
-        player = 'hls';
+    let lines = content.split('\n');
+    for (const line of lines) {
+      trimmedLine = line.trim();
+      if (!trimmedLine) continue;
+
+      metadataMatch = trimmedLine.match(regexMetadata);
+      urlMatch = trimmedLine.match(regexURL);
+
+      if (metadataMatch) {
+        currentMetadata = {
+          duration: parseInt(metadataMatch[1]),
+          tvgId: metadataMatch[2],
+          tvgLogo: metadataMatch[3],
+          group: metadataMatch[4],
+          name: metadataMatch[5].trim(),
+          url: '',
+          player: undefined,
+        };
+      } else if (currentMetadata && urlMatch) {
+        if (urlMatch[0].includes('twitch.tv')) {
+          channelUrl = getTwitchUrl(urlMatch[0]);
+          player = 'twitch';
+        } else if (
+          urlMatch[0].includes('youtube.com') ||
+          urlMatch[0].includes('youtu.be')
+        ) {
+          channelUrl = getYoutubeUrl(urlMatch[0]);
+          player = 'youtube';
+        } else {
+          channelUrl = urlMatch[0];
+          player = 'hls';
+        }
+
+        channels.push({
+          ...currentMetadata,
+          url: channelUrl,
+          player,
+        });
+
+        currentMetadata = null;
       }
-
-      channels.push({
-        ...currentMetadata,
-        url: channelUrl,
-        player,
-      });
-
-      currentMetadata = null;
     }
+
+    /////
   }
 
   return channels;
