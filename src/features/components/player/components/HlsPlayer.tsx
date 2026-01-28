@@ -2,19 +2,19 @@ import Hls from 'hls.js';
 import { useRef, useEffect } from 'react';
 
 type HlsPlayerProps = {
-  url: string | null;
+  activeChannel: string | null;
 };
 
-export default function HlsPlayer({ url }: HlsPlayerProps) {
+export default function HlsPlayer({ activeChannel }: HlsPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const videoElement = videoRef.current;
 
-    if (!Hls.isSupported() || !videoElement || !url) return;
+    if (!Hls.isSupported() || !videoElement || !activeChannel) return;
 
     const hls = new Hls();
-    hls.loadSource(url);
+    hls.loadSource(activeChannel);
     hls.attachMedia(videoElement);
 
     return () => {
@@ -24,7 +24,7 @@ export default function HlsPlayer({ url }: HlsPlayerProps) {
       videoElement.load();
       videoElement.src = '';
     };
-  }, [url]);
+  }, [activeChannel]);
 
   return (
     <video

@@ -1,7 +1,13 @@
 type TwitchPlayerProps = {
-  url: string;
+  activeChannel: string;
 };
 
-export default function TwitchPlayer({ url }: TwitchPlayerProps) {
-  return <iframe src={url} allowFullScreen className='h-full w-full'></iframe>;
+export default function TwitchPlayer({ activeChannel }: TwitchPlayerProps) {
+  return (
+    <iframe
+      src={activeChannel}
+      allowFullScreen
+      className='h-full w-full'
+    ></iframe>
+  );
 }

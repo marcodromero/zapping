@@ -7,7 +7,7 @@ export default function ChannelGuide() {
   const channels = useChannelStore((state) => state.channels);
   const fetchChannels = useChannelStore((state) => state.fetchChannels);
   const searchTerm = useChannelStore((state) => state.searchTerm);
-  const parentRef = useRef(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const filteredChannels = useMemo(() => {
     if (!channels) return [];

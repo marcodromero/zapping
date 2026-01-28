@@ -14,13 +14,10 @@ export default function ChannelCard({
   tvgLogo,
   name,
 }: ChannelCardProps) {
-  const currentChannelUrl = useChannelStore((state) => state.currentChannelUrl);
-  const setCurrentChannelUrl = useChannelStore(
-    (state) => state.setCurrentChannelUrl,
-  );
-  const setPlayer = useChannelStore((state) => state.setPlayer);
-
-  const isActive = currentChannelUrl === url;
+  const activeChannel = useChannelStore((state) => state.activeChannel);
+  const setActiveChannel = useChannelStore((state) => state.setActiveChannel);
+  const setActivePlayer = useChannelStore((state) => state.setActivePlayer);
+  const isActive = activeChannel === url;
 
   return (
     <button
@@ -29,8 +26,8 @@ export default function ChannelCard({
         `}
       onClick={() => {
         vibrateDevice();
-        setCurrentChannelUrl(url);
-        setPlayer(player);
+        setActiveChannel(url);
+        setActivePlayer(player);
       }}
     >
       <img className='lazy w-15 h-full object-contain' src={tvgLogo} />

@@ -4,13 +4,13 @@ import YoutubePlayer from './components/YoutubePlayer';
 import TwitchPlayer from './components/TwitchPlayer';
 
 export default function Player() {
-  const currentChannelUrl = useChannelStore((state) => state.currentChannelUrl);
-  const player = useChannelStore((state) => state.player);
-  if (player === 'youtube') {
-    return <YoutubePlayer url={currentChannelUrl} />;
-  } else if (player === 'twitch') {
-    return <TwitchPlayer url={currentChannelUrl} />;
+  const activeChannel = useChannelStore((state) => state.activeChannel);
+  const activePlayer = useChannelStore((state) => state.activePlayer);
+  if (activePlayer === 'youtube') {
+    return <YoutubePlayer activeChannel={activeChannel} />;
+  } else if (activePlayer === 'twitch') {
+    return <TwitchPlayer activeChannel={activeChannel} />;
   } else {
-    return <HlsPlayer url={currentChannelUrl} />;
+    return <HlsPlayer activeChannel={activeChannel} />;
   }
 }

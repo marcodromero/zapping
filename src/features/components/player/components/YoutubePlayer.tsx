@@ -1,11 +1,13 @@
 type YoutubePlayerProps = {
-  url: string | undefined;
+  activeChannel: string | undefined;
 };
 
-export default function YoutubePlayer({ url = undefined }: YoutubePlayerProps) {
+export default function YoutubePlayer({
+  activeChannel = undefined,
+}: YoutubePlayerProps) {
   return (
     <iframe
-      src={url}
+      src={activeChannel}
       title='YouTube Live Stream'
       frameBorder='0'
       allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
