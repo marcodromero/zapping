@@ -40,8 +40,13 @@ export default async function getChannels(): Promise<
   let player: 'twitch' | 'youtube' | 'hls' | '' = '';
 
   //////
-  for (const playlist of playlists) {
-    const response = await fetch(playlist);
+  for (const urlPlaylist of playlists) {
+    //Para forzar la petición en el navegador haciendole creer que es una url nueva
+    const cacheBuster = `t=${new Date().getTime()}`;
+    const separator = urlPlaylist.includes('?') ? '&' : '?';
+    const finalUrlPlaylist = `${urlPlaylist}${separator}${cacheBuster}`;
+    //
+    const response = await fetch(finalUrlPlaylist, { cache: 'no-store' });
     if (!response.ok) throw new Error('Error al obtener el archivo M3U.');
     const content = await response.text();
 
