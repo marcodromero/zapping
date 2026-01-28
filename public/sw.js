@@ -40,6 +40,7 @@ self.addEventListener('fetch', (event) => {
   // Estos NUNCA deben ir al caché porque son flujos infinitos
   if (
     url.pathname.endsWith('.m3u8') ||
+    url.pathname.endsWith('.m3u') ||
     url.pathname.endsWith('.ts') ||
     url.pathname.endsWith('.m4s') ||
     url.pathname.endsWith('.aac') ||
