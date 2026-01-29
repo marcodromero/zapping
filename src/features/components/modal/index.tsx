@@ -8,6 +8,7 @@ export default function Modal() {
   const isActive = useModalStore((state) => state.isActive);
   const closeModal = useModalStore((state) => state.closeModal);
   const alertType = useAlertStore((state) => state.type);
+  const alertMessage = useAlertStore((state) => state.message);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -57,7 +58,7 @@ export default function Modal() {
           <Alert
             id={'errorNotification'}
             color={'#ff0000'}
-            message='¡Hubo un problema! Revisa que el enlace de la playlist sea correcto.'
+            message={alertMessage}
           />
         )}
       </div>

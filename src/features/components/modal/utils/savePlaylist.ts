@@ -3,51 +3,42 @@ import { useChannelStore } from '../../../../store/channelStore';
 import { useModalStore } from '../../../../store/modalStore';
 import { isM3UPlaylist } from '../../../../utils/validators';
 
-export default async function savePlaylist(
-  url: string | null,
-): Promise<boolean> {
+export default async function savePlaylist(url: string | null): Promise<void> {
   const { showAlert } = useAlertStore.getState();
   const { fetchChannels } = useChannelStore.getState();
 
-  try {
-    if (!url || url.trim() === '') return false;
+  if (!url || url.trim() === '') return;
 
+  try {
+    const rawData = localStorage.getItem('playlists');
+    let savedPlaylists: string[] = [];
     try {
-      const parsedUrl = new URL(url);
-      if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-        throw new Error();
-      }
-    } catch (e) {
-      console.error('URL inválida:', url);
-      showAlert('error');
-      return false;
+      savedPlaylists = rawData ? JSON.parse(rawData) : [];
+    } catch {
+      savedPlaylists = [];
     }
+
+    if (savedPlaylists.includes(url))
+      throw new Error('Ya existe una Playlist con esa URL');
 
     const response = await fetch(url);
-
-    if (!response) {
-      showAlert('error');
-      return false;
-    }
+    if (!response.ok) throw new Error('No se pudo acceder a la URL');
 
     const content = await response.text();
 
     if (!isM3UPlaylist(content)) {
-      showAlert('error');
-      return false;
+      throw new Error('No es una Playlist M3U valida');
     }
-
-    const rawData = localStorage.getItem('playlists');
-    let savedPlaylists: string[] = rawData ? JSON.parse(rawData) : [];
 
     savedPlaylists.push(url);
     localStorage.setItem('playlists', JSON.stringify(savedPlaylists));
 
     await fetchChannels();
     useModalStore.setState({ isActive: false });
-    return true;
-  } catch (error) {
-    showAlert('error');
-    return false;
+    showAlert('success', '');
+    return;
+  } catch (error: unknown) {
+    if (error instanceof Error) showAlert('error', error.message);
+    return;
   }
 }
