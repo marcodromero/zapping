@@ -18,7 +18,7 @@ type ChannelStore = {
 export const useChannelStore = create<ChannelStore>((set, get) => ({
   channels: [],
   activeChannel: '',
-  activePlayer: undefined,
+  activePlayer: 'hls',
   searchTerm: '',
   isLoading: false,
   error: null,

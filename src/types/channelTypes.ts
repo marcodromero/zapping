@@ -1,4 +1,4 @@
-export type playerType = 'twitch' | 'youtube' | 'hls' | undefined;
+export type playerType = 'twitch' | 'youtube' | 'hls';
 
 export type ChannelType = {
   duration: number;

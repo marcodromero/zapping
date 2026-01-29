@@ -37,16 +37,8 @@ export default async function savePlaylist(
       return false;
     }
 
-    const oldData = localStorage.getItem('url');
-
     const rawData = localStorage.getItem('playlists');
     let savedPlaylists: string[] = rawData ? JSON.parse(rawData) : [];
-
-    //si existen datos de la version antigua de la app los vuelca al array
-    if (oldData) {
-      savedPlaylists.push(oldData);
-      localStorage.removeItem(url);
-    }
 
     savedPlaylists.push(url);
     localStorage.setItem('playlists', JSON.stringify(savedPlaylists));
