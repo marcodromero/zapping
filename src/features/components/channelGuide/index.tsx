@@ -5,7 +5,6 @@ import { useChannelStore } from '../../../store/channelStore';
 
 export default function ChannelGuide() {
   const channels = useChannelStore((state) => state.channels);
-  const fetchChannels = useChannelStore((state) => state.fetchChannels);
   const searchTerm = useChannelStore((state) => state.searchTerm);
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -25,10 +24,6 @@ export default function ChannelGuide() {
     estimateSize: () => 55,
     overscan: 5,
   });
-
-  useEffect(() => {
-    fetchChannels();
-  }, [fetchChannels]);
 
   useEffect(() => {
     rowVirtualizer.scrollToOffset(0);
