@@ -5,7 +5,7 @@ type ChannelCardProps = {
   url: string;
   tvgLogo: string;
   name: string;
-  player: 'twitch' | 'youtube' | 'hls' | undefined;
+  player: 'twitch' | 'youtube' | 'hls';
 };
 
 export default function ChannelCard({
@@ -14,10 +14,10 @@ export default function ChannelCard({
   tvgLogo,
   name,
 }: ChannelCardProps) {
-  const activeChannel = useChannelStore((state) => state.activeChannel);
-  const setActiveChannel = useChannelStore((state) => state.setActiveChannel);
+  console.log('Renderizando canal:', name);
+  const isActive = useChannelStore((state) => state.activeChannel === url);
   const setActivePlayer = useChannelStore((state) => state.setActivePlayer);
-  const isActive = activeChannel === url;
+  const setActiveChannel = useChannelStore((state) => state.setActiveChannel);
 
   return (
     <button
@@ -25,12 +25,21 @@ export default function ChannelCard({
         ${isActive ? 'bg-[#3a6280] ' : 'bg-[#1c2534] hover:bg-[#2a374a]'}
         `}
       onClick={() => {
+        if (isActive) return;
         vibrateDevice();
         setActiveChannel(url);
         setActivePlayer(player);
       }}
     >
-      <img className='lazy w-15 h-full object-contain' src={tvgLogo} />
+      <img
+        className='w-15 h-full object-contain'
+        src={tvgLogo}
+        loading='lazy'
+        onError={(e) => {
+          (e.target as HTMLImageElement).src =
+            'https://placehold.co/60x40?text=TV';
+        }}
+      />
       <p className='text-[#c0c6c9] ml-4 text-xs truncate'>{name}</p>
     </button>
   );

@@ -71,7 +71,6 @@ export default function ChannelGuide() {
                   url={channel.url}
                   player={channel.player}
                   tvgLogo={channel.tvgLogo}
-                  key={index}
                 />
               </div>
             );
