@@ -1,7 +1,7 @@
 import Player from './features/components/player';
 import ChannelGuide from './features/components/channelGuide';
 import Toolbar from './features/components/toolbar';
-import Modal from './features/components/modal';
+import Modal from './features/components/playlistManager';
 import imageStatic from './assets/images/bg-tv.jpg';
 import useInitialization from './hooks/useInitialization';
 

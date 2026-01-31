@@ -14,7 +14,6 @@ export default function ChannelCard({
   tvgLogo,
   name,
 }: ChannelCardProps) {
-  console.log('Renderizando canal:', name);
   const isActive = useChannelStore((state) => state.activeChannel === url);
   const setActivePlayer = useChannelStore((state) => state.setActivePlayer);
   const setActiveChannel = useChannelStore((state) => state.setActiveChannel);

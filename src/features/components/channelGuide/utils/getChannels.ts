@@ -1,9 +1,9 @@
 import { isM3UPlaylist } from '../../../../utils/validators';
-import type { ChannelType } from '../../../../types/channelTypes';
+import type { ChannelType, playlistType } from '../../../../types/channelTypes';
 import { parseM3U } from './parseM3U';
 
 export default async function getChannels(): Promise<ChannelType[]> {
-  let playlists: string[] = [];
+  let playlists: playlistType[] = [];
   try {
     const rawData = localStorage.getItem('playlists');
     if (!rawData) return [];
@@ -18,12 +18,13 @@ export default async function getChannels(): Promise<ChannelType[]> {
     return [];
   }
 
-  const fetchPromises = playlists.map(async (url: string) => {
+  const fetchPromises = playlists.map(async (playlist: playlistType) => {
     try {
       //Para forzar la petición en el navegador haciendole creer que es una url nueva
       const cacheBuster = `t=${new Date().getTime()}`;
-      const separator = url.includes('?') ? '&' : '?';
-      const finalUrl = `${url}${separator}${cacheBuster}`;
+      if (!playlist.url) return [];
+      const separator = playlist.url.includes('?') ? '&' : '?';
+      const finalUrl = `${playlist.url}${separator}${cacheBuster}`;
       //
       const response = await fetch(finalUrl, { cache: 'no-store' });
       if (!response.ok) throw new Error('Error al obtener el archivo M3U.');

@@ -26,7 +26,7 @@ export function parseM3U(content: string): ChannelType[] {
         group: metadataMatch[4],
         name: metadataMatch[5].trim(),
         url: '',
-        player: undefined,
+        player: 'hls',
       };
     } else if (currentMetadata && urlMatch) {
       const playerInfo = getPlayerInfo(urlMatch[0]);

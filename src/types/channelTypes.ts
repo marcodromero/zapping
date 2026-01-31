@@ -9,3 +9,8 @@ export type ChannelType = {
   url: string;
   player: playerType;
 };
+
+export type playlistType = {
+  url: string | null;
+  playlistName: string;
+};

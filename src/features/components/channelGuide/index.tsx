@@ -52,7 +52,7 @@ export default function ChannelGuide() {
             position: 'relative',
           }}
         >
-          {rowVirtualizer.getVirtualItems().map((virtualItem, index) => {
+          {rowVirtualizer.getVirtualItems().map((virtualItem) => {
             const channel = filteredChannels[virtualItem.index];
             return (
               <div

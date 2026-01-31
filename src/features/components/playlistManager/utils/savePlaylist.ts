@@ -1,9 +1,13 @@
 import { useAlertStore } from '../../../../store/alertStore';
 import { useChannelStore } from '../../../../store/channelStore';
-import { useModalStore } from '../../../../store/modalStore';
+import { usePlaylistManagerStore } from '../../../../store/playlistManagerStore';
+import type { playlistType } from '../../../../types/channelTypes';
 import { isM3UPlaylist } from '../../../../utils/validators';
 
-export default async function savePlaylist(url: string | null): Promise<void> {
+export default async function savePlaylist({
+  url,
+  playlistName = 'Playlist',
+}: playlistType): Promise<void> {
   const { showAlert } = useAlertStore.getState();
   const { fetchChannels } = useChannelStore.getState();
 
@@ -11,15 +15,18 @@ export default async function savePlaylist(url: string | null): Promise<void> {
 
   try {
     const rawData = localStorage.getItem('playlists');
-    let savedPlaylists: string[] = [];
+    let savedPlaylists: playlistType[] = [];
     try {
       savedPlaylists = rawData ? JSON.parse(rawData) : [];
     } catch {
       savedPlaylists = [];
     }
 
-    if (savedPlaylists.includes(url))
-      throw new Error('Ya existe una Playlist con esa URL');
+    const isDuplicate = savedPlaylists.some((item) => item.url === url);
+
+    if (isDuplicate) {
+      throw new Error('Esta URL ya está en tu lista');
+    }
 
     const response = await fetch(url);
     if (!response.ok) throw new Error('No se pudo acceder a la URL');
@@ -30,11 +37,11 @@ export default async function savePlaylist(url: string | null): Promise<void> {
       throw new Error('No es una Playlist M3U valida');
     }
 
-    savedPlaylists.push(url);
+    savedPlaylists.push({ url, playlistName });
     localStorage.setItem('playlists', JSON.stringify(savedPlaylists));
 
     await fetchChannels();
-    useModalStore.setState({ isActive: false });
+    usePlaylistManagerStore.setState({ isActive: false });
     showAlert('success', '');
     return;
   } catch (error: unknown) {
