@@ -11,6 +11,6 @@ export type ChannelType = {
 };
 
 export type playlistType = {
-  url: string | null;
-  playlistName: string;
+  url: string;
+  name: string;
 };

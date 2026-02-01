@@ -1,19 +1,32 @@
 import { useEffect, useRef } from 'react';
 import Alert from './components/Alert';
-import { useAlertStore } from '../../../store/alertStore';
-import savePlaylist from './utils/savePlaylist';
 import { usePlaylistManagerStore } from '../../../store/playlistManagerStore';
+import type { playlistType } from '../../../types/channelTypes';
+import PlaylistRow from './components/playlistRow';
 
 export default function PlaylistManager() {
   const isActive = usePlaylistManagerStore((state) => state.isActive);
   const closePlaylistManager = usePlaylistManagerStore(
     (state) => state.closePlaylistManager,
   );
-  const alertType = useAlertStore((state) => state.type);
-  const alertMessage = useAlertStore((state) => state.message);
+  const deletePlaylist = usePlaylistManagerStore(
+    (state) => state.deletePlaylist,
+  );
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const inputUrlRef = useRef<HTMLInputElement | null>(null);
   const inputPlaylistNameRef = useRef<HTMLInputElement | null>(null);
+  const savePlaylist = usePlaylistManagerStore((state) => state.savePlaylist);
+  const playlists = usePlaylistManagerStore((state) => state.playlists);
+  const validateUrl = usePlaylistManagerStore((state) => state.validateUrl);
+  const alertStyle = usePlaylistManagerStore((state) => state.alertStyle);
+  const message = usePlaylistManagerStore((state) => state.message);
+
+  async function handleClickSave({ url, name }: playlistType) {
+    const isValidUrl = await validateUrl(url);
+    if (!isValidUrl) return;
+    savePlaylist({ url, name });
+  }
 
   useEffect(() => {
     isActive ? dialogRef.current?.showModal() : dialogRef.current?.close();
@@ -58,41 +71,39 @@ export default function PlaylistManager() {
               onClick={() => {
                 inputUrlRef.current &&
                   inputPlaylistNameRef.current &&
-                  savePlaylist({
+                  handleClickSave({
                     url: inputUrlRef.current.value,
-                    playlistName: inputPlaylistNameRef.current.value,
+                    name: inputPlaylistNameRef.current.value,
                   });
               }}
             >
               Agregar
             </button>
           </div>
-          {alertType === 'error' && (
+          {alertStyle === 'error' && (
             <Alert
               id={'errorNotification'}
               color={'#ff0000'}
-              message={alertMessage}
+              message={message}
+            />
+          )}
+          {alertStyle === 'success' && (
+            <Alert
+              id={'successNotification'}
+              color={'#ff0'}
+              message={message}
             />
           )}
         </div>
       </section>
       <section className='flex flex-col  overflow-auto '>
-        <div className='flex justify-around'>
-          <p>Playlist 1</p>
-          <button>Eliminar</button>
-        </div>
-        <div className='flex justify-around'>
-          <p>Playlist 1</p>
-          <button>Eliminar</button>
-        </div>
-        <div className='flex justify-around'>
-          <p>Playlist 1</p>
-          <button>Eliminar</button>
-        </div>
-        <div className='flex justify-around'>
-          <p>Playlist 1</p>
-          <button>Eliminar</button>
-        </div>
+        {playlists.map((playlist, index) => (
+          <PlaylistRow
+            name={playlist.name}
+            deletePlaylist={deletePlaylist}
+            key={index}
+          />
+        ))}
       </section>
     </dialog>
   );

@@ -14,7 +14,7 @@ export default function Toolbar() {
           id='loadListButton'
           onClick={openPlaylistManager}
         >
-          CARGAR LISTA DE CANALES
+          PLAYLISTS
         </button>
       </div>
     </section>

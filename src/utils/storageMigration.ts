@@ -19,7 +19,7 @@ export function migrateStorage(): void {
       const playlists = JSON.parse(rawData);
       const newPlaylists = playlists.map((url: string) => ({
         url,
-        playlistName: 'Playlist',
+        name: url,
       }));
 
       localStorage.setItem('playlists', JSON.stringify(newPlaylists));
