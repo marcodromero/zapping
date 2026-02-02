@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import Alert from './components/Alert';
 import { usePlaylistManagerStore } from '../../../store/playlistManagerStore';
 import type { playlistType } from '../../../types/channelTypes';
-import PlaylistRow from './components/playlistRow';
+import PlaylistRow from './components/PlaylistRow';
 
 export default function PlaylistManager() {
   const isActive = usePlaylistManagerStore((state) => state.isActive);
