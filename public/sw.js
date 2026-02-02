@@ -1,4 +1,4 @@
-const cacheName = 'mi-pwa-cache-v2';
+const cacheName = 'mi-pwa-cache-v3';
 const staticAssets = [
   '/',
   '/index.html',
