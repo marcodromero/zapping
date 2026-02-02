@@ -29,6 +29,7 @@
     "react-router-dom": "^7.6.3",
     "react-window": "^2.2.5",
     "tailwindcss": "^4.1.11",
+    "typescript-eslint": "^8.54.0",
     "zustand": "^5.0.10"
   }
 }

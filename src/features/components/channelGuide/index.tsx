@@ -28,7 +28,7 @@ export default function ChannelGuide() {
 
   useEffect(() => {
     rowVirtualizer.scrollToOffset(0);
-  }, [searchTerm]);
+  }, [searchTerm, rowVirtualizer]);
 
   return (
     <section

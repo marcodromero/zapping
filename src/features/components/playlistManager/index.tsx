@@ -29,7 +29,11 @@ export default function PlaylistManager() {
   }
 
   useEffect(() => {
-    isActive ? dialogRef.current?.showModal() : dialogRef.current?.close();
+    if (isActive) {
+      dialogRef.current?.showModal();
+    } else {
+      dialogRef.current?.close();
+    }
     if (inputUrlRef.current) {
       inputUrlRef.current.value = '';
     }
@@ -69,12 +73,12 @@ export default function PlaylistManager() {
               id='confirmLoadButton'
               className='m-2 p-1 bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg'
               onClick={() => {
-                inputUrlRef.current &&
-                  inputPlaylistNameRef.current &&
+                if (inputUrlRef.current && inputPlaylistNameRef.current) {
                   handleClickSave({
                     url: inputUrlRef.current.value,
                     name: inputPlaylistNameRef.current.value,
                   });
+                }
               }}
             >
               Agregar

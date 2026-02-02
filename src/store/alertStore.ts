@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
+type alertType = 'success' | 'error' | undefined;
+
 type AlertStore = {
   type: alertType;
   message: string;
   timeOutId: number | null;
   showAlert: (type: alertType, message: string) => void;
 };
-
-type alertType = 'success' | 'error' | undefined;
 
 export const useAlertStore = create<AlertStore>((set, get) => ({
   type: undefined,
