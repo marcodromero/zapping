@@ -6,6 +6,7 @@ import { useChannelStore } from '../../../store/channelStore';
 export default function ChannelGuide() {
   const channels = useChannelStore((state) => state.channels);
   const searchTerm = useChannelStore((state) => state.searchTerm);
+  const activeChannel = useChannelStore((state) => state.activeChannel);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -55,6 +56,7 @@ export default function ChannelGuide() {
         >
           {rowVirtualizer.getVirtualItems().map((virtualItem) => {
             const channel = filteredChannels[virtualItem.index];
+            const isActive = activeChannel === channel.url;
             return (
               <div
                 key={virtualItem.key}
@@ -67,12 +69,7 @@ export default function ChannelGuide() {
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
               >
-                <ChannelCard
-                  name={channel.name}
-                  url={channel.url}
-                  player={channel.player}
-                  tvgLogo={channel.tvgLogo}
-                />
+                <ChannelCard channel={channel} isActive={isActive} />
               </div>
             );
           })}

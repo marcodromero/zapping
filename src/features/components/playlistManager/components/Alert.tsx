@@ -1,13 +1,14 @@
 type AlertProps = {
-  id: string;
+  alertStyle: string;
   color: string;
   message: string;
 };
 
-export default function Alert({ id, color, message }: AlertProps) {
-  return (
-    <p id={id} className={`text-[${color}]`}>
-      {message}
-    </p>
-  );
+export default function Alert({ alertStyle, message }: AlertProps) {
+  if (alertStyle === 'error') {
+    return <p className={`text-[#ff0000]`}>{message}</p>;
+  }
+  if (alertStyle === 'success') {
+    return <p className={`text-[#ff0]`}>{message}</p>;
+  }
 }
