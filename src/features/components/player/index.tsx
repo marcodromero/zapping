@@ -2,14 +2,14 @@ import { useChannelStore } from '../../../store/channelStore';
 import HlsPlayer from './components/HlsPlayer';
 import YoutubePlayer from './components/YoutubePlayer';
 import TwitchPlayer from './components/TwitchPlayer';
+import PlayerLayout from './components/PlayerLayout';
 
-type PLAYER_COMPONENTS_TYPE = Record<
+type playersComponentsType = Record<
   string,
   React.ComponentType<{ activeChannel: string }>
 >;
 
-//Diccionario de componentes
-const PLAYER_COMPONENTS: PLAYER_COMPONENTS_TYPE = {
+const playersComponents: playersComponentsType = {
   youtube: YoutubePlayer,
   twitch: TwitchPlayer,
   hls: HlsPlayer,
@@ -18,8 +18,11 @@ const PLAYER_COMPONENTS: PLAYER_COMPONENTS_TYPE = {
 export default function Player() {
   const activeChannel = useChannelStore((state) => state.activeChannel);
   const activePlayer = useChannelStore((state) => state.activePlayer);
+  const SelectedPlayer = playersComponents[activePlayer] || HlsPlayer;
 
-  const SelectedPlayer = PLAYER_COMPONENTS[activePlayer] || HlsPlayer;
-
-  return <SelectedPlayer activeChannel={activeChannel} />;
+  return (
+    <PlayerLayout>
+      <SelectedPlayer activeChannel={activeChannel} />
+    </PlayerLayout>
+  );
 }

@@ -8,9 +8,15 @@ type HlsPlayerProps = {
 export default function HlsPlayer({ activeChannel }: HlsPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const handleLoadData = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      videoRef.current.play();
+    }
+  };
+
   useEffect(() => {
     const videoElement = videoRef.current;
-
     if (!Hls.isSupported() || !videoElement || !activeChannel) return;
 
     const hls = new Hls();
@@ -31,12 +37,7 @@ export default function HlsPlayer({ activeChannel }: HlsPlayerProps) {
       ref={videoRef}
       controls
       className='h-full'
-      onLoadedData={() => {
-        if (!videoRef.current) return;
-        if (videoRef.current.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-          videoRef.current.play();
-        }
-      }}
+      onLoadedData={handleLoadData}
     ></video>
   );
 }

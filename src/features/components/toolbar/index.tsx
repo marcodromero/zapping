@@ -1,6 +1,6 @@
 import { usePlaylistManagerStore } from '../../../store/playlistManagerStore';
-import Search from './components/search';
-import ToolbarButton from './components/toolbarButton';
+import Search from './components/Search';
+import ToolbarButton from './components/ToolbarButton';
 
 export default function Toolbar() {
   const openPlaylistManager = usePlaylistManagerStore(
