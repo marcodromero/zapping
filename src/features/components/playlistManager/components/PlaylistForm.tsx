@@ -1,57 +1,74 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { usePlaylistManagerStore } from '../../../../store/playlistManagerStore';
-import type { playlistType } from '../../../../types/channelTypes';
+import { useForm } from 'react-hook-form';
 
-export default function PlaylistForm() {
-  const inputUrlRef = useRef<HTMLInputElement | null>(null);
-  const inputPlaylistNameRef = useRef<HTMLInputElement | null>(null);
+type PlaylistFormType = {
+  isVisible: boolean;
+};
+
+type formInputsType = {
+  inputUrl: string;
+  inputPlaylistName: string;
+};
+
+export default function PlaylistForm({ isVisible }: PlaylistFormType) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<formInputsType>();
   const savePlaylist = usePlaylistManagerStore((state) => state.savePlaylist);
   const validateUrl = usePlaylistManagerStore((state) => state.validateUrl);
 
-  async function handleClickSave({ url, name }: playlistType) {
-    const isValidUrl = await validateUrl(url);
+  const onSubmit = handleSubmit(async (data) => {
+    const isValidUrl = await validateUrl(data.inputUrl);
     if (!isValidUrl) return;
-    savePlaylist({ url, name });
-  }
+    savePlaylist({ url: data.inputUrl, name: data.inputPlaylistName });
+    reset();
+  });
 
   useEffect(() => {
-    if (inputUrlRef.current) {
-      inputUrlRef.current.value = '';
-    }
-    if (inputPlaylistNameRef.current) {
-      inputPlaylistNameRef.current.value = '';
-    }
-  }, []);
+    if (isVisible) reset();
+  }, [isVisible, reset]);
 
   return (
-    <section>
-      <div className='flex flex-col w-full h-full items-center justify-center'>
-        <p className='text-white'>Enlace de la Playlist:</p>
-        <input ref={inputUrlRef} type='text' className='bg-white m-2' />
-        <p className='text-white'>Nombre para la Playlist:</p>
+    <form
+      className='flex flex-col w-full h-auto items-center justify-center'
+      onSubmit={onSubmit}
+    >
+      <label className='text-white'>
+        Enlace de la Playlist:
         <input
-          ref={inputPlaylistNameRef}
           type='text'
           className='bg-white m-2'
+          {...register('inputUrl', {
+            required: { value: true, message: 'Este campo es requerido' },
+          })}
         />
+      </label>
+      {errors.inputUrl && <span>{errors.inputUrl.message}</span>}
+      <label className='text-white'>
+        Nombre para la Playlist:
+        <input
+          type='text'
+          className='bg-white m-2'
+          {...register('inputPlaylistName', { required: true })}
+        />
+      </label>
+      {errors.inputPlaylistName && (
+        <span>{errors.inputPlaylistName.message}</span>
+      )}
 
-        <div className='flex'>
-          <button
-            id='confirmLoadButton'
-            className='m-2 p-1 bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg'
-            onClick={() => {
-              if (inputUrlRef.current && inputPlaylistNameRef.current) {
-                handleClickSave({
-                  url: inputUrlRef.current.value,
-                  name: inputPlaylistNameRef.current.value,
-                });
-              }
-            }}
-          >
-            Agregar
-          </button>
-        </div>
+      <div className='flex'>
+        <button
+          id='confirmLoadButton'
+          className='m-2 p-1 bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg'
+          type='submit'
+        >
+          Agregar
+        </button>
       </div>
-    </section>
+    </form>
   );
 }

@@ -56,6 +56,7 @@ export const usePlaylistManagerStore = create<PlaylistManagerStore>(
       set({ timeOutId: id });
     },
     validateUrl: async (url: string) => {
+      console.log('validacion:', url);
       set({ alertStyle: undefined, message: '', isValidUrl: false });
       const isDuplicate = get().playlists.some(
         (playlist) => playlist.url === url,

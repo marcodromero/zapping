@@ -26,10 +26,7 @@ export const useChannelStore = create<ChannelStore>((set, get) => ({
   setActivePlayer: (playerName) => set({ activePlayer: playerName }),
   setSearchTerm: (searchTerm) => set({ searchTerm }),
   fetchChannels: async () => {
-    if (get().isLoading) {
-      console.log('Petición bloqueada: ya hay una carga en curso.');
-      return;
-    }
+    if (get().isLoading) return;
     set({ isLoading: true, error: null });
     try {
       const channelsData = await getChannels();

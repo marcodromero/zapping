@@ -1,4 +1,4 @@
-import imageStatic from './assets/images/bg-tv.jpg';
+import imageStatic from '../../../../assets/images/bg-tv.jpg';
 
 export default function PlayerLayout({ children }: React.PropsWithChildren) {
   return (

@@ -26,6 +26,7 @@
     "hls.js": "^1.6.15",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-hook-form": "^7.71.1",
     "react-router-dom": "^7.6.3",
     "react-window": "^2.2.5",
     "tailwindcss": "^4.1.11",

@@ -28,7 +28,7 @@ export default function PlaylistManager() {
       className='bg-[#252a2b] h-screen w-screen max-w-none max-h-none'
       ref={dialogRef}
     >
-      <section>
+      <section className='flex justify-end'>
         <button
           id='cancelLoadButton'
           className='m-2 p-1 bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg'
@@ -37,7 +37,7 @@ export default function PlaylistManager() {
           Volver
         </button>
       </section>
-      <PlaylistForm />
+      <PlaylistForm isVisible={isActive} />
       {alertStyle && (
         <Alert alertStyle={alertStyle} color={'#ff0000'} message={message} />
       )}
