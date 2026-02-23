@@ -1,7 +1,6 @@
-import vibrateDevice from '../utils/vibrateDevice';
-import { useChannelStore } from '../../../../store/channelStore';
 import type { ChannelType } from '../../../../types/channelTypes';
-import ChannelBrand from './ChannelBrand';
+import type { ReactNode } from 'react';
+import usePlayer from '../hooks/usePlayer';
 
 const colors = {
   selected: 'bg-[#3a6280] ',
@@ -11,25 +10,24 @@ const colors = {
 type ChannelCardProps = {
   channel: ChannelType;
   isActive: boolean;
+  children?: ReactNode;
 };
 
-export default function ChannelCard({ channel, isActive }: ChannelCardProps) {
-  const setActivePlayer = useChannelStore((state) => state.setActivePlayer);
-  const setActiveChannel = useChannelStore((state) => state.setActiveChannel);
-
-  const handleClickChannel = () => {
-    if (isActive) return;
-    vibrateDevice();
-    setActiveChannel(channel.url);
-    setActivePlayer(channel.player);
-  };
+export default function ChannelCard({
+  channel,
+  isActive,
+  children,
+}: ChannelCardProps) {
+  const { handleClickChannel } = usePlayer();
 
   return (
-    <button
+    <div
       className={`w-full  p-2 flex channel__button channel__play items-center h-full border-t-1 border-t-[#29374d]  border-b-2 border-b-[#0e121a] channel ${isActive ? colors.selected : colors.unselected}`}
-      onClick={handleClickChannel}
+      onClick={() =>
+        !isActive && handleClickChannel(channel.url, channel.player)
+      }
     >
-      <ChannelBrand tvgLogo={channel.tvgLogo} name={channel.name} />
-    </button>
+      {children}
+    </div>
   );
 }

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import ChannelCard from './components/ChannelCard';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useChannelStore } from '../../../store/channelStore';
+import ChannelLogo from './components/ChannelLogo';
+import ChannelTitle from './components/ChannelTitle';
 
 export default function ChannelGuide() {
   const channels = useChannelStore((state) => state.channels);
@@ -68,7 +70,10 @@ export default function ChannelGuide() {
                   transform: `translateY(${virtualItem.start}px)`,
                 }}
               >
-                <ChannelCard channel={channel} isActive={isActive} />
+                <ChannelCard channel={channel} isActive={isActive}>
+                  <ChannelLogo tvgLogo={channel.tvgLogo} />
+                  <ChannelTitle name={channel.name} />
+                </ChannelCard>
               </div>
             );
           })}
