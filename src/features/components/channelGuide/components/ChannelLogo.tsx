@@ -1,8 +1,8 @@
-type LogoChannel = {
+type ChannelLogoType = {
   tvgLogo: string;
 };
 
-export default function LogoChannel({ tvgLogo }: LogoChannel) {
+export default function ChannelLogo({ tvgLogo }: ChannelLogoType) {
   return (
     <img
       className='w-15 h-full object-contain'
