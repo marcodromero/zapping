@@ -1,84 +1,29 @@
-import { useEffect, useMemo, useRef } from 'react';
-import ChannelCard from './components/ChannelCard';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import { useRef } from 'react';
+
 import { useChannelStore } from '../../../store/channelStore';
-import ChannelLogo from './components/ChannelLogo';
-import ChannelTitle from './components/ChannelTitle';
+import ChannelList from './components/ChannelList';
+import Loading from '../../../components/Loading';
+import useChannels from './hooks/useChannels';
 
 export default function ChannelGuide() {
-  const channels = useChannelStore((state) => state.channels);
-  const searchTerm = useChannelStore((state) => state.searchTerm);
-  const activeChannel = useChannelStore((state) => state.activeChannel);
   const parentRef = useRef<HTMLDivElement>(null);
-
-  const filteredChannels = useMemo(() => {
-    if (!channels) return [];
-    if (!searchTerm) return channels;
-
-    const lowSearch = searchTerm.toLowerCase();
-    return channels.filter((channel) =>
-      channel.name.toLowerCase().includes(lowSearch),
-    );
-  }, [channels, searchTerm]);
-
-  const rowVirtualizer = useVirtualizer({
-    count: filteredChannels?.length ?? 0,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 55,
-    overscan: 5,
-  });
-
-  useEffect(() => {
-    rowVirtualizer.scrollToOffset(0);
-  }, [searchTerm, rowVirtualizer]);
+  const activeChannel = useChannelStore((state) => state.activeChannel);
+  const { filteredChannels, virtualizer } = useChannels(parentRef);
 
   return (
-    <section
+    <div
       ref={parentRef}
       className='relative overflow-auto bg-[#3c4248] w-full h-6/10'
     >
-      {!filteredChannels && (
-        <div className='absolute inset-0 flex items-center justify-center text-white animate-pulse'>
-          Cargando canales...
-        </div>
-      )}
-
-      {filteredChannels && filteredChannels.length === 0 && (
-        <div className='p-4 text-white'>No se encontraron canales.</div>
-      )}
+      {!filteredChannels && <Loading />}
 
       {filteredChannels && filteredChannels.length > 0 && (
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
-          }}
-        >
-          {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-            const channel = filteredChannels[virtualItem.index];
-            const isActive = activeChannel === channel.url;
-            return (
-              <div
-                key={virtualItem.key}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: `${virtualItem.size}px`,
-                  transform: `translateY(${virtualItem.start}px)`,
-                }}
-              >
-                <ChannelCard channel={channel} isActive={isActive}>
-                  <ChannelLogo tvgLogo={channel.tvgLogo} />
-                  <ChannelTitle name={channel.name} />
-                </ChannelCard>
-              </div>
-            );
-          })}
-        </div>
+        <ChannelList
+          activeChannel={activeChannel}
+          virtualizer={virtualizer}
+          channels={filteredChannels}
+        />
       )}
-    </section>
+    </div>
   );
 }
