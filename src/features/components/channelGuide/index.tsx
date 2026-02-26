@@ -10,20 +10,15 @@ export default function ChannelGuide() {
   const activeChannel = useChannelStore((state) => state.activeChannel);
   const { filteredChannels, virtualizer } = useChannels(parentRef);
 
-  return (
-    <div
-      ref={parentRef}
-      className='relative overflow-auto bg-[#3c4248] w-full h-6/10'
-    >
-      {!filteredChannels && <Loading />}
+  if (!filteredChannels) return <Loading />;
 
-      {filteredChannels && filteredChannels.length > 0 && (
-        <ChannelList
-          activeChannel={activeChannel}
-          virtualizer={virtualizer}
-          channels={filteredChannels}
-        />
-      )}
-    </div>
-  );
+  if (filteredChannels && filteredChannels.length > 0)
+    return (
+      <ChannelList
+        activeChannel={activeChannel}
+        virtualizer={virtualizer}
+        channels={filteredChannels}
+        parentRef={parentRef}
+      />
+    );
 }

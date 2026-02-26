@@ -2,7 +2,6 @@ import { useChannelStore } from '../../../store/channelStore';
 import HlsPlayer from './components/HlsPlayer';
 import YoutubePlayer from './components/YoutubePlayer';
 import TwitchPlayer from './components/TwitchPlayer';
-import PlayerLayout from './components/PlayerLayout';
 
 type playersComponentsType = Record<
   string,
@@ -20,9 +19,5 @@ export default function Player() {
   const activePlayer = useChannelStore((state) => state.activePlayer);
   const SelectedPlayer = playersComponents[activePlayer] || HlsPlayer;
 
-  return (
-    <PlayerLayout>
-      <SelectedPlayer activeChannel={activeChannel} />
-    </PlayerLayout>
-  );
+  return <SelectedPlayer activeChannel={activeChannel} />;
 }
