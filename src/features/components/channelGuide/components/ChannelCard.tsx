@@ -22,7 +22,7 @@ export default function ChannelCard({
 
   return (
     <div
-      className={`w-full  p-2 flex channel__button channel__play items-center h-full border-t-1 border-t-[#29374d]  border-b-2 border-b-[#0e121a] channel ${isActive ? colors.selected : colors.unselected}`}
+      className={`w-full  p-2 flex channel__button channel__play items-center h-full border-t border-t-[#29374d]  border-b-2 border-b-[#0e121a] channel ${isActive ? colors.selected : colors.unselected}`}
       onClick={() =>
         !isActive && handleClickChannel(channel.url, channel.player)
       }
