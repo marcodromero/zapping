@@ -10,7 +10,7 @@ export default function PlaylistRow({
   const [isConfirming, setIsConfirming] = useState(false);
 
   return (
-    <div className='flex justify-between items-center p-2 border-b border-gray-700 min-h-[50px]'>
+    <div className='flex justify-between items-center p-2 border-b border-gray-700 min-h-12.5'>
       {!isConfirming ? (
         <>
           <p className='text-white truncate flex-1'>{name}</p>

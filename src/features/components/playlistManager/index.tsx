@@ -3,6 +3,7 @@ import Alert from './components/Alert';
 import { usePlaylistManagerStore } from '../../../store/playlistManagerStore';
 import Playlists from './components/Playlists';
 import PlaylistForm from './components/PlaylistForm';
+import CancelButton from './components/CancelButton';
 
 export default function PlaylistManager() {
   const isActive = usePlaylistManagerStore((state) => state.isActive);
@@ -29,13 +30,7 @@ export default function PlaylistManager() {
       ref={dialogRef}
     >
       <section className='flex justify-end'>
-        <button
-          id='cancelLoadButton'
-          className='m-2 p-1 bg-[#444646] text-[#acaead] border-2 border-[#565958] rounded-lg'
-          onClick={closePlaylistManager}
-        >
-          Volver
-        </button>
+        <CancelButton text='Cancelar' onClick={closePlaylistManager} />
       </section>
       <PlaylistForm isVisible={isActive} />
       {alertStyle && (
